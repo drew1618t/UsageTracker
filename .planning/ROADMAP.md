@@ -29,10 +29,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Right-clicking tray icon displays context menu with Refresh, Settings, Login, and Exit options
   4. Clicking tray icon opens a popup window positioned near the tray
   5. App enforces single instance (prevents multiple tray icons if launched twice)
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 01-01: [To be created during phase planning]
+- [ ] 01-01-PLAN.md — Scaffold project with electron-vite, create tray icon assets, implement main process with tray and single instance
+- [ ] 01-02-PLAN.md — Implement popup window with positioning, toggle, and basic UI shell
 
 ### Phase 2: Browser Authentication
 **Goal**: Users can log in via browser and maintain authenticated session
@@ -86,7 +87,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Electron Shell + Tray Foundation | 0/? | Not started | - |
+| 1. Electron Shell + Tray Foundation | 0/2 | Planning complete | - |
 | 2. Browser Authentication | 0/? | Not started | - |
 | 3. Data Fetching + Display | 0/? | Not started | - |
 | 4. Background Polling + Settings | 0/? | Not started | - |
