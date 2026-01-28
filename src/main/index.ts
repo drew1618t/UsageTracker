@@ -1,6 +1,15 @@
 import { app, BrowserWindow, ipcMain } from 'electron'
 import { createTray, tray } from './tray'
 import { getPopupWindow, togglePopupWindow } from './window'
+import {
+  initSession,
+  checkAuthState,
+  openLoginPage,
+  logout,
+  setAuthState,
+  getAuthState,
+  persistSessionCookies
+} from './auth'
 
 // Request single instance lock
 const gotTheLock = app.requestSingleInstanceLock()
@@ -38,7 +47,18 @@ if (!gotTheLock) {
   })
 
   // Initialize app when ready
-  app.whenReady().then(() => {
+  app.whenReady().then(async () => {
+    // Initialize auth session with callback for when auth cookies are detected
+    initSession(async () => {
+      console.log('Auth cookies detected')
+      await persistSessionCookies()
+      const authStateResult = await checkAuthState()
+      setAuthState({
+        isAuthenticated: authStateResult.isAuthenticated,
+        userIdentifier: authStateResult.userEmail || null
+      })
+    })
+
     // Register IPC handlers
     ipcMain.handle('app:get-version', () => app.getVersion())
     ipcMain.handle('app:refresh-data', async () => {
@@ -46,9 +66,27 @@ if (!gotTheLock) {
       return null
     })
 
+    // Register auth IPC handlers
+    ipcMain.handle('auth:get-state', () => getAuthState())
+    ipcMain.handle('auth:login', async () => {
+      await openLoginPage()
+    })
+    ipcMain.handle('auth:logout', async () => {
+      await logout()
+      setAuthState({ isAuthenticated: false, userIdentifier: null })
+    })
+
     // Create system tray
     createTray()
     console.log('Tray created successfully')
+
+    // Check initial auth state
+    const authStateResult = await checkAuthState()
+    setAuthState({
+      isAuthenticated: authStateResult.isAuthenticated,
+      userIdentifier: authStateResult.userEmail || null
+    })
+    console.log('Initial auth state:', authStateResult)
   })
 
   // Clean up before quit
