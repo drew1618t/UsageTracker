@@ -13,7 +13,7 @@ Build a Windows system tray application that displays Claude.ai usage limits at 
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Electron Shell + Tray Foundation** - Establish tray icon infrastructure and basic UI
-- [ ] **Phase 2: Browser Authentication** - Implement login flow with session persistence
+- [x] **Phase 2: Browser Authentication** - Implement login flow with session persistence
 - [ ] **Phase 3: Data Fetching + Display** - Fetch usage data and display with visual indicators
 - [ ] **Phase 4: Background Polling + Settings** - Automatic updates and user configuration
 
@@ -47,8 +47,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 02-01-PLAN.md — Create auth module with session management, gray tray icon, and IPC handlers
-- [ ] 02-02-PLAN.md — Update popup UI for auth state display and verify complete login flow
+- [x] 02-01-PLAN.md — Create auth module with session management, gray tray icon, and IPC handlers
+- [x] 02-02-PLAN.md — Update popup UI for auth state display and verify complete login flow
 
 ### Phase 3: Data Fetching + Display
 **Goal**: Users see their current usage limits with visual indicators
@@ -89,6 +89,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Electron Shell + Tray Foundation | 2/2 | ✓ Complete | 2026-01-28 |
-| 2. Browser Authentication | 0/2 | Not started | - |
+| 2. Browser Authentication | 2/2 | ✓ Complete | 2026-01-28 |
 | 3. Data Fetching + Display | 0/? | Not started | - |
 | 4. Background Polling + Settings | 0/? | Not started | - |

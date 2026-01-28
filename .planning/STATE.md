@@ -5,34 +5,34 @@
 See: .planning/PROJECT.md (updated 2026-01-27)
 
 **Core value:** See how close you are to your Claude usage limits without leaving what you're doing — one glance at the system tray tells you if you're good, getting close, or tapped out.
-**Current focus:** Phase 2 - Browser Authentication
+**Current focus:** Phase 3 - Data Fetching + Display
 
 ## Current Position
 
-Phase: 2 of 4 (Browser Authentication)
-Plan: 1 of ? in current phase
-Status: In progress
-Last activity: 2026-01-28 — Completed 02-01-PLAN.md (Browser Authentication Infrastructure)
+Phase: 3 of 4 (Data Fetching + Display)
+Plan: 0 of ? in current phase
+Status: Ready to plan
+Last activity: 2026-01-28 — Phase 2 complete, verified
 
-Progress: [███░░░░░░░] 30%
+Progress: [█████░░░░░] 50%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 3
-- Average duration: 30 min
-- Total execution time: 1.50 hours
+- Total plans completed: 4
+- Average duration: 35 min
+- Total execution time: 2.33 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-electron-shell-tray-foundation | 2 | 86 min | 43 min |
-| 02-browser-authentication | 1 | 4 min | 4 min |
+| 02-browser-authentication | 2 | 49 min | 25 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (4 min), 01-02 (82 min), 02-01 (4 min)
-- Trend: Phase 2 started efficiently - auth infrastructure very fast due to clear research and plan
+- Last 5 plans: 01-01 (4 min), 01-02 (82 min), 02-01 (4 min), 02-02 (45 min)
+- Trend: Phase 2 complete - second plan took longer due to bug fixes during human verification
 
 *Updated after each plan completion*
 
@@ -51,7 +51,6 @@ Recent decisions affecting current work:
 **From 01-01 execution:**
 - Used electron-vite for modern Vite-based build tooling instead of webpack
 - Created 3 color variations of tray icon (green/yellow/red) as infrastructure for Phase 3 status display
-- Added GUID to Tray constructor for persistent positioning in Windows system tray
 - Prevented app quit on window-all-closed to keep tray alive
 - Used contextBridge.exposeInMainWorld instead of nodeIntegration for secure renderer IPC
 
@@ -69,6 +68,13 @@ Recent decisions affecting current work:
 - Dynamic import pattern to avoid circular dependencies between auth/state.ts and tray.ts
 - IPC handlers with auth: namespace prefix for authentication operations
 
+**From 02-02 execution:**
+- Use BrowserWindow for login instead of shell.openExternal (system browser cookies are separate from Electron)
+- Only detect sessionKey/__session/auth_token as auth cookies (not Cloudflare cookies like __cf_bm)
+- Don't attempt email extraction from cookies - just show "Logged in" status
+- Removed tray GUID to avoid Windows icon caching issues
+- Added URL polling for SPA navigation detection in login window auto-close
+
 ### Pending Todos
 
 None yet.
@@ -80,7 +86,7 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-01-28 (plan execution)
-Stopped at: Completed 02-01-PLAN.md (Browser Authentication Infrastructure)
+Stopped at: Completed Phase 2 (Browser Authentication)
 Resume file: None
 
-**Phase 2 Started:** Auth infrastructure complete. Ready for next plan in phase 2.
+**Phase 2 Complete:** Authentication flow verified end-to-end. Phase 3 (Data Fetching + Display) ready to plan.

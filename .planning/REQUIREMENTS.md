@@ -14,9 +14,9 @@
 
 ### Authentication
 
-- [ ] **AUTH-01**: User can log in via browser window that opens Claude.ai sign-in page
-- [ ] **AUTH-02**: Authenticated session persists across app restarts (no re-login each launch)
-- [ ] **AUTH-03**: App detects expired session and prompts user to re-authenticate
+- [x] **AUTH-01**: User can log in via browser window that opens Claude.ai sign-in page
+- [x] **AUTH-02**: Authenticated session persists across app restarts (no re-login each launch)
+- [x] **AUTH-03**: App detects expired session and prompts user to re-authenticate
 
 ### Data Display
 
@@ -73,9 +73,9 @@
 | TRAY-02 | Phase 3 | Pending |
 | TRAY-03 | Phase 3 | Pending |
 | TRAY-04 | Phase 1 | Complete |
-| AUTH-01 | Phase 2 | Pending |
-| AUTH-02 | Phase 2 | Pending |
-| AUTH-03 | Phase 2 | Pending |
+| AUTH-01 | Phase 2 | Complete |
+| AUTH-02 | Phase 2 | Complete |
+| AUTH-03 | Phase 2 | Complete |
 | DATA-01 | Phase 3 | Pending |
 | DATA-02 | Phase 3 | Pending |
 | DATA-03 | Phase 3 | Pending |
@@ -92,4 +92,4 @@
 
 ---
 *Requirements defined: 2026-01-27*
-*Last updated: 2026-01-28 after Phase 1 completion*
+*Last updated: 2026-01-28 after Phase 2 completion*
