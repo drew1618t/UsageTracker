@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow, ipcMain } from 'electron'
 import { createTray, tray } from './tray'
 import { getPopupWindow, togglePopupWindow } from './window'
 
@@ -32,6 +32,13 @@ if (!gotTheLock) {
 
   // Initialize app when ready
   app.whenReady().then(() => {
+    // Register IPC handlers
+    ipcMain.handle('app:get-version', () => app.getVersion())
+    ipcMain.handle('app:refresh-data', async () => {
+      // Placeholder for future implementation
+      return null
+    })
+
     // Create system tray
     createTray()
     console.log('Tray created successfully')
