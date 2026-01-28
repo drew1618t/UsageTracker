@@ -44,10 +44,11 @@ Plans:
   2. After user completes login, auth window closes and app shows "Logged in as [email]" in popup
   3. User closes app and relaunches without needing to log in again (session persists)
   4. When session expires, app detects this and prompts user to re-authenticate from popup
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 02-01: [To be created during phase planning]
+- [ ] 02-01-PLAN.md — Create auth module with session management, gray tray icon, and IPC handlers
+- [ ] 02-02-PLAN.md — Update popup UI for auth state display and verify complete login flow
 
 ### Phase 3: Data Fetching + Display
 **Goal**: Users see their current usage limits with visual indicators
@@ -88,6 +89,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Electron Shell + Tray Foundation | 2/2 | ✓ Complete | 2026-01-28 |
-| 2. Browser Authentication | 0/? | Not started | - |
+| 2. Browser Authentication | 0/2 | Not started | - |
 | 3. Data Fetching + Display | 0/? | Not started | - |
 | 4. Background Polling + Settings | 0/? | Not started | - |
