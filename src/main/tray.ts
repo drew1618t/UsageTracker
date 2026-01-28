@@ -10,6 +10,7 @@ export function createTray(): Tray {
   // Check initial auth state to set correct icon
   const authState = getAuthState()
   const iconName = authState.isAuthenticated ? 'tray-green.ico' : 'tray-gray.ico'
+  console.log('createTray - authState:', authState, 'iconName:', iconName)
 
   // Resolve icon path based on environment (dev vs production)
   const isDev = !app.isPackaged
@@ -17,10 +18,12 @@ export function createTray(): Tray {
     ? path.join(__dirname, `../../resources/icons/${iconName}`)
     : path.join(process.resourcesPath, `icons/${iconName}`)
 
+  console.log('createTray - iconPath:', iconPath)
   const icon = nativeImage.createFromPath(iconPath)
+  console.log('createTray - icon isEmpty:', icon.isEmpty())
 
-  // Create tray with GUID for persistent positioning in Windows tray
-  tray = new Tray(icon, '7c3e8f2a-4b6d-9e1f-a5c0-d8b7f6324198')
+  // Create tray (removed GUID to avoid Windows icon caching issues)
+  tray = new Tray(icon)
 
   // Set tooltip based on auth state
   const tooltip = authState.isAuthenticated
@@ -110,12 +113,17 @@ export function rebuildContextMenu(): void {
  * Update tray icon and tooltip based on authentication state
  */
 export function updateTrayForAuthState(isAuthenticated: boolean): void {
-  if (!tray) return
+  console.log('updateTrayForAuthState called with:', isAuthenticated)
+  if (!tray) {
+    console.log('updateTrayForAuthState - tray is null, skipping')
+    return
+  }
 
   // Determine icon based on auth state
   // When authenticated, use green (or yellow/red based on usage in future)
   // When not authenticated, use gray
   const iconName = isAuthenticated ? 'tray-green.ico' : 'tray-gray.ico'
+  console.log('updateTrayForAuthState - setting icon to:', iconName)
 
   // Resolve icon path
   const isDev = !app.isPackaged
@@ -124,6 +132,7 @@ export function updateTrayForAuthState(isAuthenticated: boolean): void {
     : path.join(process.resourcesPath, `icons/${iconName}`)
 
   const icon = nativeImage.createFromPath(iconPath)
+  console.log('updateTrayForAuthState - icon isEmpty:', icon.isEmpty())
   tray.setImage(icon)
 
   // Update tooltip
