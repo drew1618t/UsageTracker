@@ -7,10 +7,10 @@
 
 ### Tray Shell
 
-- [ ] **TRAY-01**: App creates a persistent system tray icon that survives Explorer restarts
+- [x] **TRAY-01**: App creates a persistent system tray icon that survives Explorer restarts
 - [ ] **TRAY-02**: Tray icon color reflects the most limiting usage limit (green < 70%, yellow 70-90%, red >= 90%)
 - [ ] **TRAY-03**: Hovering over tray icon shows tooltip with current usage summary
-- [ ] **TRAY-04**: Right-click tray icon shows context menu (Refresh, Settings, Login, Exit)
+- [x] **TRAY-04**: Right-click tray icon shows context menu (Refresh, Settings, Login, Exit)
 
 ### Authentication
 
@@ -69,10 +69,10 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| TRAY-01 | Phase 1 | Pending |
-| TRAY-02 | Phase 1 | Pending |
-| TRAY-03 | Phase 1 | Pending |
-| TRAY-04 | Phase 1 | Pending |
+| TRAY-01 | Phase 1 | Complete |
+| TRAY-02 | Phase 3 | Pending |
+| TRAY-03 | Phase 3 | Pending |
+| TRAY-04 | Phase 1 | Complete |
 | AUTH-01 | Phase 2 | Pending |
 | AUTH-02 | Phase 2 | Pending |
 | AUTH-03 | Phase 2 | Pending |
@@ -92,4 +92,4 @@
 
 ---
 *Requirements defined: 2026-01-27*
-*Last updated: 2026-01-27 after roadmap creation*
+*Last updated: 2026-01-28 after Phase 1 completion*

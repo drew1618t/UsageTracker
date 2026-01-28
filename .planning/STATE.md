@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-01-27)
 
 **Core value:** See how close you are to your Claude usage limits without leaving what you're doing — one glance at the system tray tells you if you're good, getting close, or tapped out.
-**Current focus:** Phase 1 - Electron Shell + Tray Foundation
+**Current focus:** Phase 2 - Browser Authentication
 
 ## Current Position
 
-Phase: 1 of 4 (Electron Shell + Tray Foundation)
-Plan: 2 of 2 in current phase
-Status: Phase complete
-Last activity: 2026-01-28 — Completed 01-02-PLAN.md
+Phase: 2 of 4 (Browser Authentication)
+Plan: 0 of ? in current phase
+Status: Ready to plan
+Last activity: 2026-01-28 — Phase 1 complete, verified
 
-Progress: [██████████] 100%
+Progress: [██░░░░░░░░] 25%
 
 ## Performance Metrics
 
@@ -75,4 +75,4 @@ Last session: 2026-01-28 (plan execution)
 Stopped at: Completed 01-02-PLAN.md (Popup Window)
 Resume file: None
 
-**Phase 1 Complete:** All foundation work done. Ready to proceed to Phase 2 (Login Flow + Authentication).
+**Phase 1 Complete:** All foundation work done. Phase 2 (Browser Authentication) ready to plan.

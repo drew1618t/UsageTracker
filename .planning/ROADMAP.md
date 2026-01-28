@@ -12,7 +12,7 @@ Build a Windows system tray application that displays Claude.ai usage limits at 
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Electron Shell + Tray Foundation** - Establish tray icon infrastructure and basic UI
+- [x] **Phase 1: Electron Shell + Tray Foundation** - Establish tray icon infrastructure and basic UI
 - [ ] **Phase 2: Browser Authentication** - Implement login flow with session persistence
 - [ ] **Phase 3: Data Fetching + Display** - Fetch usage data and display with visual indicators
 - [ ] **Phase 4: Background Polling + Settings** - Automatic updates and user configuration
@@ -32,8 +32,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 2 plans
 
 Plans:
-- [ ] 01-01-PLAN.md — Scaffold project with electron-vite, create tray icon assets, implement main process with tray and single instance
-- [ ] 01-02-PLAN.md — Implement popup window with positioning, toggle, and basic UI shell
+- [x] 01-01-PLAN.md — Scaffold project with electron-vite, create tray icon assets, implement main process with tray and single instance
+- [x] 01-02-PLAN.md — Implement popup window with positioning, toggle, and basic UI shell
 
 ### Phase 2: Browser Authentication
 **Goal**: Users can log in via browser and maintain authenticated session
@@ -87,7 +87,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Electron Shell + Tray Foundation | 0/2 | Planning complete | - |
+| 1. Electron Shell + Tray Foundation | 2/2 | ✓ Complete | 2026-01-28 |
 | 2. Browser Authentication | 0/? | Not started | - |
 | 3. Data Fetching + Display | 0/? | Not started | - |
 | 4. Background Polling + Settings | 0/? | Not started | - |
