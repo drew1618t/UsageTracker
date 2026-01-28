@@ -20,7 +20,6 @@ export function getAuthState(): AuthState {
 /**
  * Update authentication state
  * Notifies all renderer windows and updates tray icon
- * Note: Tray updates are handled by tray.ts importing and calling this
  */
 export function setAuthState(state: AuthState): void {
   authState = { ...state }
@@ -29,5 +28,13 @@ export function setAuthState(state: AuthState): void {
   const windows = BrowserWindow.getAllWindows()
   windows.forEach((win) => {
     win.webContents.send('auth-state-changed', authState)
+  })
+
+  // Update tray icon for auth state (dynamic import to avoid circular dependency)
+  import('../tray').then(({ updateTrayForAuthState, rebuildContextMenu }) => {
+    updateTrayForAuthState(state.isAuthenticated)
+    rebuildContextMenu()
+  }).catch(err => {
+    console.error('Failed to update tray for auth state:', err)
   })
 }
