@@ -18,15 +18,17 @@ export function initSession(onAuthSuccess: () => void): void {
 
     // Check if authentication cookie was added for Claude.ai
     if (cookie.domain.includes('claude.ai')) {
-      // Look for common auth cookie patterns
+      // Look for actual auth cookie patterns (NOT __cf_bm which is just Cloudflare bot management)
       const isAuthCookie =
         cookie.name.includes('session') ||
         cookie.name.includes('auth') ||
-        cookie.name === '__cf_bm' ||
-        cookie.name === '__client' ||
-        cookie.name === 'sessionKey'
+        cookie.name === 'sessionKey' ||
+        cookie.name === '__client'
 
-      if (isAuthCookie) {
+      // Exclude Cloudflare cookies that are NOT auth-related
+      const isCloudflareNonAuth = cookie.name === '__cf_bm' || cookie.name.startsWith('cf_')
+
+      if (isAuthCookie && !isCloudflareNonAuth) {
         onAuthSuccess()
       }
     }
@@ -53,14 +55,15 @@ export async function checkAuthState(): Promise<{
     (c) => !c.expirationDate || c.expirationDate > now
   )
 
-  // Look for known auth cookies
+  // Look for known auth cookies (NOT __cf_bm which is just Cloudflare bot management)
   const hasAuthCookie = validCookies.some(
     (c) =>
-      c.name.includes('session') ||
-      c.name.includes('auth') ||
-      c.name === '__cf_bm' ||
-      c.name === '__client' ||
-      c.name === 'sessionKey'
+      (c.name.includes('session') ||
+        c.name.includes('auth') ||
+        c.name === '__client' ||
+        c.name === 'sessionKey') &&
+      c.name !== '__cf_bm' &&
+      !c.name.startsWith('cf_')
   )
 
   // Try to extract email from cookies (if available)
