@@ -1,5 +1,6 @@
 import { app, BrowserWindow } from 'electron'
-import { createTray } from './tray'
+import { createTray, tray } from './tray'
+import { getPopupWindow, togglePopupWindow } from './window'
 
 // Request single instance lock
 const gotTheLock = app.requestSingleInstanceLock()
@@ -12,8 +13,15 @@ if (!gotTheLock) {
 
   // Handle second instance attempts
   app.on('second-instance', (_event, _commandLine, _workingDirectory) => {
-    // Log for now - future phases will focus popup window
-    console.log('Second instance attempted - single instance lock working')
+    // Focus existing popup window or toggle it open
+    const popup = getPopupWindow()
+    if (popup) {
+      if (popup.isMinimized()) popup.restore()
+      popup.show()
+      popup.focus()
+    } else if (tray) {
+      togglePopupWindow(tray.getBounds())
+    }
   })
 
   // Prevent app from quitting when all windows are closed

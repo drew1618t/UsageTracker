@@ -1,5 +1,6 @@
 import { Tray, nativeImage, Menu, app } from 'electron'
 import path from 'path'
+import { togglePopupWindow } from './window'
 
 export let tray: Tray | null = null
 
@@ -51,6 +52,13 @@ export function createTray(): Tray {
   ])
 
   tray.setContextMenu(contextMenu)
+
+  // Add click handler to toggle popup window
+  tray.on('click', () => {
+    if (tray) {
+      togglePopupWindow(tray.getBounds())
+    }
+  })
 
   return tray
 }
