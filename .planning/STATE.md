@@ -10,28 +10,29 @@ See: .planning/PROJECT.md (updated 2026-01-27)
 ## Current Position
 
 Phase: 2 of 4 (Browser Authentication)
-Plan: 0 of ? in current phase
-Status: Ready to plan
-Last activity: 2026-01-28 — Phase 1 complete, verified
+Plan: 1 of ? in current phase
+Status: In progress
+Last activity: 2026-01-28 — Completed 02-01-PLAN.md (Browser Authentication Infrastructure)
 
-Progress: [██░░░░░░░░] 25%
+Progress: [███░░░░░░░] 30%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 2
-- Average duration: 43 min
-- Total execution time: 1.43 hours
+- Total plans completed: 3
+- Average duration: 30 min
+- Total execution time: 1.50 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-electron-shell-tray-foundation | 2 | 86 min | 43 min |
+| 02-browser-authentication | 1 | 4 min | 4 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (4 min), 01-02 (82 min)
-- Trend: Phase 1 complete - popup window task was significantly longer due to UX refinements
+- Last 5 plans: 01-01 (4 min), 01-02 (82 min), 02-01 (4 min)
+- Trend: Phase 2 started efficiently - auth infrastructure very fast due to clear research and plan
 
 *Updated after each plan completion*
 
@@ -61,6 +62,13 @@ Recent decisions affecting current work:
 - Frameless, skipTaskbar, alwaysOnTop window configuration for popup UX
 - Screen bounds clamping to prevent popup from appearing off-screen
 
+**From 02-01 execution:**
+- Cookie polling with cookies.on('changed') event for auth detection (not deep-linking)
+- Session cookie to persistent cookie conversion with 30-day expiration to prevent logout on restart
+- Gray tray icon for logged-out state; green for logged-in (usage colors in Phase 3)
+- Dynamic import pattern to avoid circular dependencies between auth/state.ts and tray.ts
+- IPC handlers with auth: namespace prefix for authentication operations
+
 ### Pending Todos
 
 None yet.
@@ -72,7 +80,7 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-01-28 (plan execution)
-Stopped at: Completed 01-02-PLAN.md (Popup Window)
+Stopped at: Completed 02-01-PLAN.md (Browser Authentication Infrastructure)
 Resume file: None
 
-**Phase 1 Complete:** All foundation work done. Phase 2 (Browser Authentication) ready to plan.
+**Phase 2 Started:** Auth infrastructure complete. Ready for next plan in phase 2.
