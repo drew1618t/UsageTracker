@@ -44,11 +44,7 @@ function App() {
       <header className="app-header">
         <h1 className="app-title">Claude Usage</h1>
         <div className="header-right">
-          {authState.isAuthenticated && (
-            <span className="user-badge">
-              {authState.userIdentifier || 'Logged in'}
-            </span>
-          )}
+          {authState.isAuthenticated && <span className="user-badge">Logged in</span>}
           <span className="app-version">v{version}</span>
         </div>
       </header>

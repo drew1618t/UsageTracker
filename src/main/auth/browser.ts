@@ -45,23 +45,47 @@ export async function openLoginPage(): Promise<void> {
     loginWindow = null
   })
 
-  // Auto-close window when navigated to main Claude page (login complete)
-  loginWindow.webContents.on('did-navigate', (_event, url) => {
-    // If we navigated to the main Claude page (not login), user is logged in
-    if (
+  // Check if URL indicates successful login
+  const isLoggedInUrl = (url: string): boolean => {
+    return (
       url.startsWith('https://claude.ai') &&
       !url.includes('/login') &&
       !url.includes('/signup') &&
-      !url.includes('/oauth')
-    ) {
+      !url.includes('/oauth') &&
+      !url.includes('/verify')
+    )
+  }
+
+  // Auto-close window when navigated to main Claude page (login complete)
+  // Listen for both full navigation and SPA navigation
+  const handleNavigation = (url: string): void => {
+    console.log('Login window navigation:', url)
+    if (isLoggedInUrl(url)) {
       // Small delay to ensure cookies are fully set
       setTimeout(() => {
         if (loginWindow && !loginWindow.isDestroyed()) {
+          console.log('Login complete, closing window')
           loginWindow.close()
         }
-      }, 500)
+      }, 1000)
     }
-  })
+  }
+
+  loginWindow.webContents.on('did-navigate', (_event, url) => handleNavigation(url))
+  loginWindow.webContents.on('did-navigate-in-page', (_event, url) => handleNavigation(url))
+
+  // Also check URL changes via polling as fallback for SPA routing
+  const urlCheckInterval = setInterval(() => {
+    if (!loginWindow || loginWindow.isDestroyed()) {
+      clearInterval(urlCheckInterval)
+      return
+    }
+    const currentUrl = loginWindow.webContents.getURL()
+    if (isLoggedInUrl(currentUrl)) {
+      clearInterval(urlCheckInterval)
+      handleNavigation(currentUrl)
+    }
+  }, 1000)
 }
 
 /**

@@ -18,17 +18,14 @@ export function initSession(onAuthSuccess: () => void): void {
 
     // Check if authentication cookie was added for Claude.ai
     if (cookie.domain.includes('claude.ai')) {
-      // Look for actual auth cookie patterns (NOT __cf_bm which is just Cloudflare bot management)
+      console.log('Cookie changed:', cookie.name)
+
+      // Only trigger on the actual auth cookie, not supporting cookies
       const isAuthCookie =
-        cookie.name.includes('session') ||
-        cookie.name.includes('auth') ||
-        cookie.name === 'sessionKey' ||
-        cookie.name === '__client'
+        cookie.name === 'sessionKey' || cookie.name === '__session' || cookie.name === 'auth_token'
 
-      // Exclude Cloudflare cookies that are NOT auth-related
-      const isCloudflareNonAuth = cookie.name === '__cf_bm' || cookie.name.startsWith('cf_')
-
-      if (isAuthCookie && !isCloudflareNonAuth) {
+      if (isAuthCookie) {
+        console.log('Auth cookie detected, triggering auth success')
         onAuthSuccess()
       }
     }
@@ -55,36 +52,26 @@ export async function checkAuthState(): Promise<{
     (c) => !c.expirationDate || c.expirationDate > now
   )
 
-  // Look for known auth cookies (NOT __cf_bm which is just Cloudflare bot management)
-  const hasAuthCookie = validCookies.some(
-    (c) =>
-      (c.name.includes('session') ||
-        c.name.includes('auth') ||
-        c.name === '__client' ||
-        c.name === 'sessionKey') &&
-      c.name !== '__cf_bm' &&
-      !c.name.startsWith('cf_')
+  // Log cookies for debugging
+  console.log(
+    'Auth check - cookies found:',
+    validCookies.map((c) => c.name)
   )
 
-  // Try to extract email from cookies (if available)
-  // This is a best-effort attempt - email might not be in cookies
-  let userEmail: string | undefined
-
-  // Check for common patterns where email might be stored
-  const emailCookie = validCookies.find(
-    (c) => c.name.includes('email') || c.name.includes('user')
+  // Look for specific known Claude.ai auth cookie
+  // The key auth cookie is 'sessionKey' - other cookies like lastActiveOrg are not auth
+  const authCookie = validCookies.find(
+    (c) => c.name === 'sessionKey' || c.name === '__session' || c.name === 'auth_token'
   )
-  if (emailCookie) {
-    try {
-      userEmail = decodeURIComponent(emailCookie.value)
-    } catch {
-      // Ignore decode errors
-    }
-  }
 
+  const isAuthenticated = !!authCookie
+  console.log('Auth check result:', { isAuthenticated, authCookieName: authCookie?.name })
+
+  // Don't try to extract email from cookies - it's not reliably available
+  // and we end up showing UUIDs. Just indicate logged in/out state.
   return {
-    isAuthenticated: hasAuthCookie && validCookies.length > 0,
-    userEmail
+    isAuthenticated,
+    userEmail: undefined
   }
 }
 
