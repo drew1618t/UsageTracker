@@ -30,6 +30,13 @@ if (!gotTheLock) {
     e.preventDefault()
   })
 
+  // Prevent app from quitting on macOS
+  app.on('activate', () => {
+    if (tray) {
+      togglePopupWindow(tray.getBounds())
+    }
+  })
+
   // Initialize app when ready
   app.whenReady().then(() => {
     // Register IPC handlers

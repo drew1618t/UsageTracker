@@ -2,6 +2,7 @@ import { BrowserWindow, screen, app } from 'electron'
 import path from 'path'
 
 let popupWindow: BrowserWindow | null = null
+let lastBlurTime = 0
 
 export function getPopupWindow(): BrowserWindow | null {
   return popupWindow
@@ -48,6 +49,7 @@ export function createPopupWindow(trayBounds: Electron.Rectangle): BrowserWindow
 
   // Hide on focus loss (auto-hide when clicking outside)
   popupWindow.on('blur', () => {
+    lastBlurTime = Date.now()
     popupWindow?.hide()
   })
 
@@ -76,6 +78,12 @@ export function togglePopupWindow(trayBounds: Electron.Rectangle): void {
   // If window is visible, hide it
   if (popupWindow && popupWindow.isVisible()) {
     popupWindow.hide()
+    return
+  }
+
+  // Prevent flicker: if blur just happened, don't immediately show
+  // (blur fires when clicking tray icon to hide, then click handler fires)
+  if (Date.now() - lastBlurTime < 200) {
     return
   }
 

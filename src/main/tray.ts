@@ -60,6 +60,17 @@ export function createTray(): Tray {
     }
   })
 
+  // Handle tray destruction (e.g., Windows Explorer restart)
+  // Recreate the tray when it's destroyed
+  tray.on('destroyed', () => {
+    console.log('Tray destroyed, recreating...')
+    setTimeout(() => {
+      if (!tray || tray.isDestroyed()) {
+        createTray()
+      }
+    }, 1000)
+  })
+
   return tray
 }
 
