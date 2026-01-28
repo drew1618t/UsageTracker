@@ -61,10 +61,12 @@ Plans:
   4. User can click Refresh in popup or context menu to manually update data
   5. When network fails, popup shows last-known data with "Last updated X minutes ago" indicator
   6. The most limiting metric is visually emphasized in popup (highlighted or positioned first)
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 03-01: [To be created during phase planning]
+- [ ] 03-01-PLAN.md — API module with usage fetching, types, state management, and IPC handlers
+- [ ] 03-02-PLAN.md — ProgressBar and UsageDisplay UI components with gradient styling
+- [ ] 03-03-PLAN.md — Integration into App.tsx, tray icon color updates, and human verification
 
 ### Phase 4: Background Polling + Settings
 **Goal**: Usage data stays fresh automatically with user control over behavior
@@ -90,5 +92,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 |-------|----------------|--------|-----------|
 | 1. Electron Shell + Tray Foundation | 2/2 | ✓ Complete | 2026-01-28 |
 | 2. Browser Authentication | 2/2 | ✓ Complete | 2026-01-28 |
-| 3. Data Fetching + Display | 0/? | Not started | - |
+| 3. Data Fetching + Display | 0/3 | Planned | - |
 | 4. Background Polling + Settings | 0/? | Not started | - |
