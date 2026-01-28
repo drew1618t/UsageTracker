@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-01-27)
 ## Current Position
 
 Phase: 1 of 4 (Electron Shell + Tray Foundation)
-Plan: 1 of 2 in current phase
-Status: In progress
-Last activity: 2026-01-28 — Completed 01-01-PLAN.md
+Plan: 2 of 2 in current phase
+Status: Phase complete
+Last activity: 2026-01-28 — Completed 01-02-PLAN.md
 
-Progress: [█████░░░░░] 50%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 1
-- Average duration: 4 min
-- Total execution time: 0.07 hours
+- Total plans completed: 2
+- Average duration: 43 min
+- Total execution time: 1.43 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-electron-shell-tray-foundation | 1 | 4 min | 4 min |
+| 01-electron-shell-tray-foundation | 2 | 86 min | 43 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (4 min)
-- Trend: First plan completed
+- Last 5 plans: 01-01 (4 min), 01-02 (82 min)
+- Trend: Phase 1 complete - popup window task was significantly longer due to UX refinements
 
 *Updated after each plan completion*
 
@@ -54,6 +54,13 @@ Recent decisions affecting current work:
 - Prevented app quit on window-all-closed to keep tray alive
 - Used contextBridge.exposeInMainWorld instead of nodeIntegration for secure renderer IPC
 
+**From 01-02 execution:**
+- Implemented 200ms debounce on blur-triggered hides to prevent toggle flicker
+- Added tray 'destroyed' event handler to automatically recreate tray after Windows Explorer restart
+- Used dark theme (#1a1a2e background) for native tray popup feel
+- Frameless, skipTaskbar, alwaysOnTop window configuration for popup UX
+- Screen bounds clamping to prevent popup from appearing off-screen
+
 ### Pending Todos
 
 None yet.
@@ -65,5 +72,7 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-01-28 (plan execution)
-Stopped at: Completed 01-01-PLAN.md (Electron Shell + Tray Foundation)
+Stopped at: Completed 01-02-PLAN.md (Popup Window)
 Resume file: None
+
+**Phase 1 Complete:** All foundation work done. Ready to proceed to Phase 2 (Login Flow + Authentication).
