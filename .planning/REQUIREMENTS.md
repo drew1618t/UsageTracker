@@ -8,8 +8,8 @@
 ### Tray Shell
 
 - [x] **TRAY-01**: App creates a persistent system tray icon that survives Explorer restarts
-- [ ] **TRAY-02**: Tray icon color reflects the most limiting usage limit (green < 70%, yellow 70-90%, red >= 90%)
-- [ ] **TRAY-03**: Hovering over tray icon shows tooltip with current usage summary
+- [x] **TRAY-02**: Tray icon color reflects the most limiting usage limit (green < 70%, yellow 70-90%, red >= 90%)
+- [x] **TRAY-03**: Hovering over tray icon shows tooltip with current usage summary
 - [x] **TRAY-04**: Right-click tray icon shows context menu (Refresh, Settings, Login, Exit)
 
 ### Authentication
@@ -20,17 +20,17 @@
 
 ### Data Display
 
-- [ ] **DATA-01**: Clicking tray icon opens panel showing 3 progress bars (session limit, weekly all-models, weekly Sonnet-only)
-- [ ] **DATA-02**: Each limit shows a countdown until reset ("Resets in 2h 34m")
-- [ ] **DATA-03**: The most limiting constraint is visually emphasized in the expanded panel
-- [ ] **DATA-04**: When offline or fetch fails, panel shows last-known data with a stale indicator
+- [x] **DATA-01**: Clicking tray icon opens panel showing 3 progress bars (session limit, weekly all-models, weekly Sonnet-only)
+- [x] **DATA-02**: Each limit shows a countdown until reset ("Resets in 2h 34m")
+- [x] **DATA-03**: The most limiting constraint is visually emphasized in the expanded panel
+- [x] **DATA-04**: When offline or fetch fails, panel shows last-known data with a stale indicator
 
 ### Polling & Refresh
 
-- [ ] **POLL-01**: App polls Claude.ai for usage data on a regular background interval (default 5 min)
-- [ ] **POLL-02**: User can trigger manual refresh from panel or context menu
-- [ ] **POLL-03**: User can configure the polling interval via settings
-- [ ] **POLL-04**: App can be set to auto-start when Windows boots
+- [x] **POLL-01**: App polls Claude.ai for usage data on a regular background interval (default 5 min)
+- [x] **POLL-02**: User can trigger manual refresh from panel or context menu
+- [x] **POLL-03**: User can configure the polling interval via settings
+- [x] **POLL-04**: App can be set to auto-start when Windows boots
 
 ## v2 Requirements
 
@@ -70,20 +70,20 @@
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | TRAY-01 | Phase 1 | Complete |
-| TRAY-02 | Phase 3 | Pending |
-| TRAY-03 | Phase 3 | Pending |
+| TRAY-02 | Phase 3 | Complete |
+| TRAY-03 | Phase 3 | Complete |
 | TRAY-04 | Phase 1 | Complete |
 | AUTH-01 | Phase 2 | Complete |
 | AUTH-02 | Phase 2 | Complete |
 | AUTH-03 | Phase 2 | Complete |
-| DATA-01 | Phase 3 | Pending |
-| DATA-02 | Phase 3 | Pending |
-| DATA-03 | Phase 3 | Pending |
-| DATA-04 | Phase 3 | Pending |
-| POLL-01 | Phase 4 | Pending |
-| POLL-02 | Phase 3 | Pending |
-| POLL-03 | Phase 4 | Pending |
-| POLL-04 | Phase 4 | Pending |
+| DATA-01 | Phase 3 | Complete |
+| DATA-02 | Phase 3 | Complete |
+| DATA-03 | Phase 3 | Complete |
+| DATA-04 | Phase 3 | Complete |
+| POLL-01 | Phase 4 | Complete |
+| POLL-02 | Phase 3 | Complete |
+| POLL-03 | Phase 4 | Complete |
+| POLL-04 | Phase 4 | Complete |
 
 **Coverage:**
 - v1 requirements: 15 total
@@ -92,4 +92,4 @@
 
 ---
 *Requirements defined: 2026-01-27*
-*Last updated: 2026-01-28 after Phase 2 completion*
+*Last updated: 2026-01-29 after v1 milestone completion*

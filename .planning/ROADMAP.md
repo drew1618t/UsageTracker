@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Electron Shell + Tray Foundation** - Establish tray icon infrastructure and basic UI
 - [x] **Phase 2: Browser Authentication** - Implement login flow with session persistence
 - [x] **Phase 3: Data Fetching + Display** - Fetch usage data and display with visual indicators
-- [ ] **Phase 4: Background Polling + Settings** - Automatic updates and user configuration
+- [x] **Phase 4: Background Polling + Settings** - Automatic updates and user configuration
 
 ## Phase Details
 
@@ -81,8 +81,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 04-01-PLAN.md — Install dependencies, create settings module with electron-store, polling module with exponential backoff, wire into app lifecycle
-- [ ] 04-02-PLAN.md — Add settings IPC handlers, Settings UI component with slider and toggle, integrate into popup
+- [x] 04-01-PLAN.md — Install dependencies, create settings module with electron-store, polling module with exponential backoff, wire into app lifecycle
+- [x] 04-02-PLAN.md — Add settings IPC handlers, Settings UI component with slider and toggle, integrate into popup
 
 ## Progress
 
@@ -94,4 +94,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | 1. Electron Shell + Tray Foundation | 2/2 | ✓ Complete | 2026-01-28 |
 | 2. Browser Authentication | 2/2 | ✓ Complete | 2026-01-28 |
 | 3. Data Fetching + Display | 3/3 | ✓ Complete | 2026-01-29 |
-| 4. Background Polling + Settings | 0/2 | Not started | - |
+| 4. Background Polling + Settings | 2/2 | ✓ Complete | 2026-01-29 |

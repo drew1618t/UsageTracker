@@ -5,14 +5,14 @@
 See: .planning/PROJECT.md (updated 2026-01-27)
 
 **Core value:** See how close you are to your Claude usage limits without leaving what you're doing — one glance at the system tray tells you if you're good, getting close, or tapped out.
-**Current focus:** Phase 4 - Background Polling + Settings (In progress)
+**Current focus:** v1 Milestone Complete ✓
 
 ## Current Position
 
 Phase: 4 of 4 (Background Polling + Settings)
 Plan: 2 of 2 in current phase
-Status: Phase complete
-Last activity: 2026-01-29 — Completed 04-02-PLAN.md
+Status: v1 Complete - all phases verified
+Last activity: 2026-01-29 — v1 milestone complete, all 15 requirements satisfied
 
 Progress: [██████████] 100%
 
