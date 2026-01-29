@@ -30,6 +30,10 @@ export async function refreshUsageData(): Promise<UsageData> {
     // Notify all renderer windows of the update
     notifyUsageDataChanged(data)
 
+    // Update tray icon color based on usage
+    const { updateTrayForUsage } = await import('../tray')
+    updateTrayForUsage(data)
+
     return data
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : 'Unknown error'

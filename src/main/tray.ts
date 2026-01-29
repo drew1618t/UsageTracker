@@ -3,6 +3,7 @@ import path from 'path'
 import { togglePopupWindow } from './window'
 import { getAuthState } from './auth/state'
 import { openLoginPage, logout, setAuthState } from './auth'
+import type { UsageData } from './api/types'
 
 export let tray: Tray | null = null
 
@@ -66,9 +67,13 @@ function buildContextMenu(): Menu {
   return Menu.buildFromTemplate([
     {
       label: 'Refresh',
-      click: () => {
-        // Placeholder for future implementation
-        console.log('Refresh clicked')
+      click: async () => {
+        const { refreshUsageData } = await import('./state/usage')
+        try {
+          await refreshUsageData()
+        } catch (error) {
+          console.error('Refresh failed:', error)
+        }
       }
     },
     {
@@ -153,4 +158,42 @@ export function updateTrayIcon(status: 'green' | 'yellow' | 'red'): void {
 
   const icon = nativeImage.createFromPath(iconPath)
   tray.setImage(icon)
+}
+
+/**
+ * Update tray icon and tooltip based on usage data
+ */
+export function updateTrayForUsage(data: UsageData): void {
+  if (!tray || tray.isDestroyed()) return
+
+  // Find most limiting constraint (highest percentage)
+  const percentages = [
+    data.sessionLimit.percentage,
+    data.weeklyAllModels.percentage,
+    data.weeklySonnet.percentage
+  ]
+  const maxPercentage = Math.max(...percentages)
+
+  // Determine icon color based on thresholds
+  let iconColor: 'green' | 'yellow' | 'red'
+  if (maxPercentage >= 90) {
+    iconColor = 'red'
+  } else if (maxPercentage >= 70) {
+    iconColor = 'yellow'
+  } else {
+    iconColor = 'green'
+  }
+
+  // Update icon
+  const isDev = !app.isPackaged
+  const iconPath = isDev
+    ? path.join(__dirname, `../../resources/icons/tray-${iconColor}.ico`)
+    : path.join(process.resourcesPath, `icons/tray-${iconColor}.ico`)
+
+  const icon = nativeImage.createFromPath(iconPath)
+  tray.setImage(icon)
+
+  // Update tooltip with usage summary
+  const tooltip = `Claude Usage: ${Math.round(maxPercentage)}% (most limiting)`
+  tray.setToolTip(tooltip)
 }
