@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-27)
 
 **Core value:** See how close you are to your Claude usage limits without leaving what you're doing — one glance at the system tray tells you if you're good, getting close, or tapped out.
-**Current focus:** Phase 3 - Data Fetching + Display (Complete)
+**Current focus:** Phase 4 - Background Polling + Settings (In progress)
 
 ## Current Position
 
-Phase: 3 of 4 (Data Fetching + Display)
-Plan: 3 of 3 in current phase
-Status: Complete - human verified
-Last activity: 2026-01-29 — Phase 3 complete, all plans executed and verified
+Phase: 4 of 4 (Background Polling + Settings)
+Plan: 1 of 2 in current phase
+Status: In progress
+Last activity: 2026-01-29 — Completed 04-01-PLAN.md
 
-Progress: [███████░░░] 75%
+Progress: [████████░░] 80%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 7
-- Average duration: 20 min
-- Total execution time: 2.75 hours
+- Total plans completed: 8
+- Average duration: 18 min
+- Total execution time: 2.83 hours
 
 **By Phase:**
 
@@ -30,10 +30,11 @@ Progress: [███████░░░] 75%
 | 01-electron-shell-tray-foundation | 2 | 86 min | 43 min |
 | 02-browser-authentication | 2 | 49 min | 25 min |
 | 03-data-fetching-display | 3 | 30 min | 10 min |
+| 04-background-polling-settings | 1 | 5 min | 5 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-01 (4 min), 02-02 (45 min), 03-01 (3 min), 03-02 (2 min), 03-03 (25 min)
-- Trend: Phase 3 completed - third plan took longer due to API endpoint discovery and debugging
+- Last 5 plans: 02-02 (45 min), 03-01 (3 min), 03-02 (2 min), 03-03 (25 min), 04-01 (5 min)
+- Trend: Phase 4 plan 1 was very fast - straightforward module integration with no surprises
 
 *Updated after each plan completion*
 
@@ -93,6 +94,15 @@ Recent decisions affecting current work:
 - Use net.request with useSessionCookies (not net.fetch) for reliable cookie handling with custom session partitions
 - Tooltip shows which limit is most limiting (e.g., "Claude: Weekly 79%")
 
+**From 04-01 execution:**
+- Use electron-store for settings persistence (de-facto standard for Electron)
+- Recursive setTimeout (not setInterval) for polling allows dynamic interval changes
+- Exponential backoff: 5 attempts, 1s-60s delay, full jitter via exponential-backoff package
+- Stop retries immediately on auth errors (401/403) to avoid aggressive loops
+- ESM/CJS compatibility pattern: `const Module = require('pkg'); const Store = Module.default || Module`
+- Dynamic import of polling module in settings onDidChange to avoid circular dependency
+- Polling lifecycle: start on authenticated, stop on logout/quit
+
 ### Pending Todos
 
 None.
@@ -104,7 +114,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-29 (plan execution)
-Stopped at: Completed Phase 3 (Data Fetching + Display)
+Stopped at: Completed 04-01-PLAN.md
 Resume file: None
 
-**Phase 3 Complete:** Usage data fetching and display verified end-to-end. Phase 4 (Background Polling + Settings) ready to plan.
+**Phase 4 Plan 1 Complete:** Background polling infrastructure with settings persistence implemented. Ready for 04-02 (Settings UI).
