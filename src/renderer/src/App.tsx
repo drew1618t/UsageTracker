@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import './App.css'
 import { UsageDisplay } from './components/UsageDisplay'
+import { Settings } from './components/Settings'
 
 interface AuthState {
   isAuthenticated: boolean
@@ -35,6 +36,7 @@ function App() {
     userIdentifier: null
   })
   const [isLoggingIn, setIsLoggingIn] = useState(false)
+  const [showSettings, setShowSettings] = useState(false)
   const [usageState, setUsageState] = useState<UsageState>({
     data: null,
     lastUpdated: null,
@@ -116,6 +118,15 @@ function App() {
         <h1 className="app-title">Claude Usage</h1>
         <div className="header-right">
           {authState.isAuthenticated && <span className="user-badge">Logged in</span>}
+          {authState.isAuthenticated && (
+            <button
+              className="settings-button"
+              onClick={() => setShowSettings(!showSettings)}
+              title="Settings"
+            >
+              ⚙
+            </button>
+          )}
           <span className="app-version">v{version}</span>
         </div>
       </header>
@@ -136,6 +147,8 @@ function App() {
               Log in with Claude.ai
             </button>
           </div>
+        ) : showSettings ? (
+          <Settings onClose={() => setShowSettings(false)} />
         ) : (
           <UsageDisplay
             data={usageState.data}
