@@ -1,5 +1,51 @@
-import { net, session } from 'electron'
+import { net, session, ClientRequest } from 'electron'
 import type { UsageData, UsageLimit } from './types'
+
+/**
+ * Make an authenticated request using net.request (better cookie handling)
+ */
+function makeAuthenticatedRequest(
+  url: string,
+  ses: Electron.Session
+): Promise<{ status: number; data: any }> {
+  return new Promise((resolve, reject) => {
+    const request = net.request({
+      url,
+      method: 'GET',
+      session: ses,
+      useSessionCookies: true
+    })
+
+    request.setHeader('Accept', 'application/json')
+    request.setHeader(
+      'User-Agent',
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+    )
+
+    let responseData = ''
+
+    request.on('response', (response) => {
+      response.on('data', (chunk) => {
+        responseData += chunk.toString()
+      })
+
+      response.on('end', () => {
+        try {
+          const data = JSON.parse(responseData)
+          resolve({ status: response.statusCode, data })
+        } catch {
+          resolve({ status: response.statusCode, data: responseData })
+        }
+      })
+    })
+
+    request.on('error', (error) => {
+      reject(error)
+    })
+
+    request.end()
+  })
+}
 
 /**
  * Fetches usage data from Claude.ai API using authenticated session cookies.
@@ -24,10 +70,11 @@ import type { UsageData, UsageLimit } from './types'
  */
 export async function fetchUsageData(): Promise<UsageData> {
   try {
-    const defaultSession = session.defaultSession
+    // Use the same session partition as auth module
+    const ses = session.fromPartition('persist:main')
 
     // Get organization ID from cookies
-    const orgId = await getOrganizationId(defaultSession)
+    const orgId = await getOrganizationId(ses)
     if (!orgId) {
       throw new Error('Could not find organization ID. Please log in to Claude.ai.')
     }
@@ -35,33 +82,23 @@ export async function fetchUsageData(): Promise<UsageData> {
     const usageUrl = `https://claude.ai/api/organizations/${orgId}/usage`
     console.log('[Usage API] Fetching usage data from:', usageUrl)
 
-    // Fetch usage data with session cookies
-    const response = await net.fetch(usageUrl, {
-      credentials: 'include',
-      headers: {
-        Accept: 'application/json',
-        'User-Agent':
-          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-      },
-      session: defaultSession
-    })
+    // Fetch usage data with session cookies using net.request
+    const { status, data: rawData } = await makeAuthenticatedRequest(usageUrl, ses)
 
-    console.log('[Usage API] Response status:', response.status)
+    console.log('[Usage API] Response status:', status)
 
     // Handle authentication errors
-    if (response.status === 401 || response.status === 403) {
+    if (status === 401 || status === 403) {
+      console.error('[Usage API] Auth error response:', rawData)
       throw new Error('Not authenticated. Please log in to Claude.ai.')
     }
 
     // Handle other HTTP errors
-    if (!response.ok) {
-      const errorText = await response.text()
-      console.error('[Usage API] Error response:', errorText)
-      throw new Error(`Failed to fetch usage data: ${response.status}`)
+    if (status < 200 || status >= 300) {
+      console.error('[Usage API] Error response:', rawData)
+      throw new Error(`Failed to fetch usage data: ${status}`)
     }
 
-    // Parse JSON response
-    const rawData = await response.json()
     console.log('[Usage API] Raw response:', JSON.stringify(rawData, null, 2))
 
     // Transform API response to UsageData structure
@@ -87,10 +124,16 @@ async function getOrganizationId(ses: Electron.Session): Promise<string | null> 
     // Try lastActiveOrg cookie first
     const cookies = await ses.cookies.get({ url: 'https://claude.ai' })
 
+    // Debug: log all cookie names
+    console.log(
+      '[Usage API] Available cookies:',
+      cookies.map((c) => c.name)
+    )
+
     // Look for lastActiveOrg cookie
     const orgCookie = cookies.find((c) => c.name === 'lastActiveOrg')
     if (orgCookie?.value) {
-      console.log('[Usage API] Found org ID from lastActiveOrg cookie')
+      console.log('[Usage API] Found org ID from lastActiveOrg cookie:', orgCookie.value)
       return orgCookie.value
     }
 
@@ -102,11 +145,15 @@ async function getOrganizationId(ses: Electron.Session): Promise<string | null> 
       session: ses
     })
 
+    console.log('[Usage API] /api/organizations status:', response.status)
+
     if (response.ok) {
       const orgs = await response.json()
+      console.log('[Usage API] /api/organizations response:', JSON.stringify(orgs, null, 2))
+
       // Return first org's UUID if available
       if (Array.isArray(orgs) && orgs.length > 0 && orgs[0].uuid) {
-        console.log('[Usage API] Found org ID from /api/organizations')
+        console.log('[Usage API] Found org ID from /api/organizations:', orgs[0].uuid)
         return orgs[0].uuid
       }
     }

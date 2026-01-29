@@ -167,18 +167,21 @@ export function updateTrayForUsage(data: UsageData): void {
   if (!tray || tray.isDestroyed()) return
 
   // Find most limiting constraint (highest percentage)
-  const percentages = [
-    data.sessionLimit.percentage,
-    data.weeklyAllModels.percentage,
-    data.weeklySonnet.percentage
+  const limits = [
+    { name: 'Session', percentage: data.sessionLimit.percentage },
+    { name: 'Weekly', percentage: data.weeklyAllModels.percentage },
+    { name: 'Sonnet', percentage: data.weeklySonnet.percentage }
   ]
-  const maxPercentage = Math.max(...percentages)
+
+  // Sort by percentage descending to find most limiting
+  limits.sort((a, b) => b.percentage - a.percentage)
+  const mostLimiting = limits[0]
 
   // Determine icon color based on thresholds
   let iconColor: 'green' | 'yellow' | 'red'
-  if (maxPercentage >= 90) {
+  if (mostLimiting.percentage >= 90) {
     iconColor = 'red'
-  } else if (maxPercentage >= 70) {
+  } else if (mostLimiting.percentage >= 70) {
     iconColor = 'yellow'
   } else {
     iconColor = 'green'
@@ -193,7 +196,7 @@ export function updateTrayForUsage(data: UsageData): void {
   const icon = nativeImage.createFromPath(iconPath)
   tray.setImage(icon)
 
-  // Update tooltip with usage summary
-  const tooltip = `Claude Usage: ${Math.round(maxPercentage)}% (most limiting)`
+  // Update tooltip with usage summary - show which limit is highest
+  const tooltip = `Claude: ${mostLimiting.name} ${Math.round(mostLimiting.percentage)}%`
   tray.setToolTip(tooltip)
 }
