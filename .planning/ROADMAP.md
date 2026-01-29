@@ -78,10 +78,11 @@ Plans:
   3. User can open Settings dialog and change polling interval (1 min to 30 min range)
   4. User can enable/disable "Start with Windows" from Settings, and app respects this on next boot
   5. App implements exponential backoff when network errors occur (prevents aggressive retry loops)
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 04-01: [To be created during phase planning]
+- [ ] 04-01-PLAN.md — Install dependencies, create settings module with electron-store, polling module with exponential backoff, wire into app lifecycle
+- [ ] 04-02-PLAN.md — Add settings IPC handlers, Settings UI component with slider and toggle, integrate into popup
 
 ## Progress
 
@@ -93,4 +94,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | 1. Electron Shell + Tray Foundation | 2/2 | ✓ Complete | 2026-01-28 |
 | 2. Browser Authentication | 2/2 | ✓ Complete | 2026-01-28 |
 | 3. Data Fetching + Display | 3/3 | ✓ Complete | 2026-01-29 |
-| 4. Background Polling + Settings | 0/? | Not started | - |
+| 4. Background Polling + Settings | 0/2 | Not started | - |
