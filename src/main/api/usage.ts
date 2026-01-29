@@ -4,31 +4,35 @@ import type { UsageData, UsageLimit } from './types'
 /**
  * Fetches usage data from Claude.ai API using authenticated session cookies.
  *
- * API Endpoint Discovery:
- * The Claude.ai usage API endpoint is not publicly documented. This implementation
- * uses the endpoint discovered by inspecting network requests at claude.ai/settings/usage.
- *
- * Current endpoint: https://api.claude.ai/api/organizations/{org_id}/usage
- * Alternative endpoint (if above fails): https://claude.ai/api/usage
+ * API Endpoint: https://claude.ai/api/organizations/{org_id}/usage
+ * Discovered by inspecting network requests at claude.ai/settings/usage.
  *
  * The API returns usage data for:
- * - Session limit (per-session message count)
- * - Weekly all models (combined weekly usage across all models)
- * - Weekly Sonnet (weekly usage for Claude 3.5 Sonnet specifically)
+ * - five_hour: Session limit (5-hour rolling window)
+ * - seven_day: Weekly all models (7-day usage across all models)
+ * - seven_day_sonnet: Weekly Sonnet-specific usage
+ *
+ * Response format:
+ * {
+ *   "five_hour": { "utilization": 29.0, "resets_at": "2026-01-29T15:59:59.532208+00:00" },
+ *   "seven_day": { "utilization": 79.0, "resets_at": "..." },
+ *   "seven_day_sonnet": { "utilization": 41.0, "resets_at": "..." } | null
+ * }
  *
  * @returns Promise<UsageData> - Usage data with all three limit types
  * @throws Error if not authenticated (401), network error, or invalid response
  */
 export async function fetchUsageData(): Promise<UsageData> {
   try {
-    // Get the session to access cookies
     const defaultSession = session.defaultSession
 
-    // Fetch organization ID from cookies or storage
-    // For now, we'll attempt to fetch from a common endpoint that doesn't require org_id
-    // If this fails, we may need to extract org_id from auth cookies or a separate API call
-    const usageUrl = 'https://claude.ai/api/usage'
+    // Get organization ID from cookies
+    const orgId = await getOrganizationId(defaultSession)
+    if (!orgId) {
+      throw new Error('Could not find organization ID. Please log in to Claude.ai.')
+    }
 
+    const usageUrl = `https://claude.ai/api/organizations/${orgId}/usage`
     console.log('[Usage API] Fetching usage data from:', usageUrl)
 
     // Fetch usage data with session cookies
@@ -53,7 +57,7 @@ export async function fetchUsageData(): Promise<UsageData> {
     if (!response.ok) {
       const errorText = await response.text()
       console.error('[Usage API] Error response:', errorText)
-      throw new Error(`Failed to fetch usage data: ${response.status} ${response.statusText}`)
+      throw new Error(`Failed to fetch usage data: ${response.status}`)
     }
 
     // Parse JSON response
@@ -61,10 +65,7 @@ export async function fetchUsageData(): Promise<UsageData> {
     console.log('[Usage API] Raw response:', JSON.stringify(rawData, null, 2))
 
     // Transform API response to UsageData structure
-    // Note: The actual API response structure may differ from this assumption
-    // This will need to be adjusted based on the real API response
     const usageData = transformUsageResponse(rawData)
-
     console.log('[Usage API] Transformed usage data:', usageData)
 
     return usageData
@@ -78,80 +79,88 @@ export async function fetchUsageData(): Promise<UsageData> {
 }
 
 /**
- * Transforms the raw Claude.ai API response into our UsageData structure.
- * This function will need to be adjusted based on the actual API response format.
+ * Gets the organization ID from cookies.
+ * Claude.ai stores the last active org in 'lastActiveOrg' cookie.
+ */
+async function getOrganizationId(ses: Electron.Session): Promise<string | null> {
+  try {
+    // Try lastActiveOrg cookie first
+    const cookies = await ses.cookies.get({ url: 'https://claude.ai' })
+
+    // Look for lastActiveOrg cookie
+    const orgCookie = cookies.find((c) => c.name === 'lastActiveOrg')
+    if (orgCookie?.value) {
+      console.log('[Usage API] Found org ID from lastActiveOrg cookie')
+      return orgCookie.value
+    }
+
+    // Fallback: try to get from organizations endpoint
+    console.log('[Usage API] lastActiveOrg cookie not found, trying /api/organizations')
+    const response = await net.fetch('https://claude.ai/api/organizations', {
+      credentials: 'include',
+      headers: { Accept: 'application/json' },
+      session: ses
+    })
+
+    if (response.ok) {
+      const orgs = await response.json()
+      // Return first org's UUID if available
+      if (Array.isArray(orgs) && orgs.length > 0 && orgs[0].uuid) {
+        console.log('[Usage API] Found org ID from /api/organizations')
+        return orgs[0].uuid
+      }
+    }
+
+    return null
+  } catch (error) {
+    console.error('[Usage API] Error getting organization ID:', error)
+    return null
+  }
+}
+
+/**
+ * Transforms the Claude.ai API response into our UsageData structure.
+ *
+ * API response format:
+ * {
+ *   "five_hour": { "utilization": 29.0, "resets_at": "ISO-timestamp" },
+ *   "seven_day": { "utilization": 79.0, "resets_at": "ISO-timestamp" },
+ *   "seven_day_sonnet": { "utilization": 41.0, "resets_at": "ISO-timestamp" } | null
+ * }
  */
 function transformUsageResponse(rawData: any): UsageData {
-  // Calculate percentage helper
-  const calcPercentage = (current: number, total: number): number => {
-    if (total === 0) return 0
-    return Math.min(100, Math.round((current / total) * 100))
-  }
-
-  // Helper to create UsageLimit from raw data
+  // Helper to create UsageLimit from API data
+  // Note: API provides utilization as percentage (0-100), not current/total
   const createLimit = (
-    current: number,
-    total: number,
-    resetAt: string
-  ): UsageLimit => ({
-    current,
-    total,
-    percentage: calcPercentage(current, total),
-    resetAt
-  })
+    data: { utilization: number; resets_at: string } | null
+  ): UsageLimit => {
+    if (!data) {
+      // Return zero limit if not available
+      return {
+        current: 0,
+        total: 100,
+        percentage: 0,
+        resetAt: new Date().toISOString()
+      }
+    }
 
-  // Try to extract data from common API response patterns
-  // Pattern 1: Direct limit objects
-  if (rawData.sessionLimit && rawData.weeklyAllModels && rawData.weeklySonnet) {
+    // API gives utilization as percentage directly
+    const percentage = Math.round(data.utilization)
+
     return {
-      sessionLimit: createLimit(
-        rawData.sessionLimit.current,
-        rawData.sessionLimit.total,
-        rawData.sessionLimit.resetAt
-      ),
-      weeklyAllModels: createLimit(
-        rawData.weeklyAllModels.current,
-        rawData.weeklyAllModels.total,
-        rawData.weeklyAllModels.resetAt
-      ),
-      weeklySonnet: createLimit(
-        rawData.weeklySonnet.current,
-        rawData.weeklySonnet.total,
-        rawData.weeklySonnet.resetAt
-      ),
-      fetchedAt: new Date().toISOString()
+      // Estimate current/total from percentage (API doesn't provide absolute values)
+      current: percentage,
+      total: 100,
+      percentage,
+      resetAt: data.resets_at
     }
   }
 
-  // Pattern 2: Nested under 'usage' or 'data' key
-  const data = rawData.usage || rawData.data || rawData
-  if (data.sessionLimit || data.session) {
-    const session = data.sessionLimit || data.session
-    const weeklyAll = data.weeklyAllModels || data.weekly_all || data.weekly
-    const weeklySonnet = data.weeklySonnet || data.weekly_sonnet
-
-    return {
-      sessionLimit: createLimit(
-        session.current || session.used || 0,
-        session.total || session.limit || 0,
-        session.resetAt || session.reset_at || new Date().toISOString()
-      ),
-      weeklyAllModels: createLimit(
-        weeklyAll?.current || weeklyAll?.used || 0,
-        weeklyAll?.total || weeklyAll?.limit || 0,
-        weeklyAll?.resetAt || weeklyAll?.reset_at || new Date().toISOString()
-      ),
-      weeklySonnet: createLimit(
-        weeklySonnet?.current || weeklySonnet?.used || 0,
-        weeklySonnet?.total || weeklySonnet?.limit || 0,
-        weeklySonnet?.resetAt || weeklySonnet?.reset_at || new Date().toISOString()
-      ),
-      fetchedAt: new Date().toISOString()
-    }
+  // Map API fields to our structure
+  return {
+    sessionLimit: createLimit(rawData.five_hour),
+    weeklyAllModels: createLimit(rawData.seven_day),
+    weeklySonnet: createLimit(rawData.seven_day_sonnet),
+    fetchedAt: new Date().toISOString()
   }
-
-  // If we can't parse the response, throw an error with the raw data for debugging
-  throw new Error(
-    `Unable to parse usage data from API response. Raw data: ${JSON.stringify(rawData)}`
-  )
 }
