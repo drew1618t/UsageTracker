@@ -3,6 +3,27 @@ export interface AuthState {
   userIdentifier: string | null
 }
 
+export interface UsageLimit {
+  current: number
+  total: number
+  percentage: number
+  resetAt: string
+}
+
+export interface UsageData {
+  sessionLimit: UsageLimit
+  weeklyAllModels: UsageLimit
+  weeklySonnet: UsageLimit
+  fetchedAt: string
+}
+
+export interface UsageState {
+  data: UsageData | null
+  lastUpdated: Date | null
+  error: string | null
+  isLoading: boolean
+}
+
 export interface ElectronAPI {
   getVersion: () => Promise<string>
   refreshData: () => Promise<void>
@@ -13,6 +34,10 @@ export interface ElectronAPI {
   login: () => Promise<void>
   logout: () => Promise<void>
   onAuthStateChanged: (callback: (state: AuthState) => void) => () => void
+  // Usage data methods
+  getUsageData: () => Promise<UsageState>
+  refreshUsageData: () => Promise<UsageState>
+  onUsageDataChanged: (callback: (data: UsageData) => void) => () => void
 }
 
 declare global {

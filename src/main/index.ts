@@ -10,6 +10,7 @@ import {
   getAuthState,
   persistSessionCookies
 } from './auth'
+import { getUsageData, refreshUsageData } from './state/usage'
 
 // Request single instance lock
 const gotTheLock = app.requestSingleInstanceLock()
@@ -74,6 +75,13 @@ if (!gotTheLock) {
     ipcMain.handle('auth:logout', async () => {
       await logout()
       setAuthState({ isAuthenticated: false, userIdentifier: null })
+    })
+
+    // Register usage IPC handlers
+    ipcMain.handle('usage:get', () => getUsageData())
+    ipcMain.handle('usage:refresh', async () => {
+      await refreshUsageData()
+      return getUsageData()
     })
 
     // Create system tray

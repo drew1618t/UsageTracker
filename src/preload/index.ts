@@ -6,6 +6,28 @@ export interface AuthState {
   userIdentifier: string | null
 }
 
+// Usage data interfaces
+export interface UsageLimit {
+  current: number
+  total: number
+  percentage: number
+  resetAt: string
+}
+
+export interface UsageData {
+  sessionLimit: UsageLimit
+  weeklyAllModels: UsageLimit
+  weeklySonnet: UsageLimit
+  fetchedAt: string
+}
+
+export interface UsageState {
+  data: UsageData | null
+  lastUpdated: Date | null
+  error: string | null
+  isLoading: boolean
+}
+
 // Expose secure IPC bridge to renderer
 contextBridge.exposeInMainWorld('electronAPI', {
   // Get app version
@@ -52,6 +74,27 @@ contextBridge.exposeInMainWorld('electronAPI', {
     // Return cleanup function
     return () => {
       ipcRenderer.removeListener('auth-state-changed', listener)
+    }
+  },
+
+  // Usage data methods
+  getUsageData: (): Promise<UsageState> => {
+    return ipcRenderer.invoke('usage:get')
+  },
+
+  refreshUsageData: (): Promise<UsageState> => {
+    return ipcRenderer.invoke('usage:refresh')
+  },
+
+  onUsageDataChanged: (callback: (data: UsageData) => void): (() => void) => {
+    const listener = (_event: Electron.IpcRendererEvent, data: UsageData) => {
+      callback(data)
+    }
+    ipcRenderer.on('usage-data-changed', listener)
+
+    // Return cleanup function
+    return () => {
+      ipcRenderer.removeListener('usage-data-changed', listener)
     }
   }
 })
