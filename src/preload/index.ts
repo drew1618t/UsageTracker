@@ -6,6 +6,12 @@ export interface AuthState {
   userIdentifier: string | null
 }
 
+// Settings interface
+export interface SettingsSchema {
+  pollingIntervalMinutes: number
+  autoStartEnabled: boolean
+}
+
 // Usage data interfaces
 export interface UsageLimit {
   current: number
@@ -96,5 +102,26 @@ contextBridge.exposeInMainWorld('electronAPI', {
     return () => {
       ipcRenderer.removeListener('usage-data-changed', listener)
     }
+  },
+
+  // Settings methods
+  getSettings: (): Promise<SettingsSchema> => {
+    return ipcRenderer.invoke('settings:get')
+  },
+
+  setPollingInterval: (minutes: number): Promise<void> => {
+    return ipcRenderer.invoke('settings:set-polling-interval', minutes)
+  },
+
+  setAutoStart: (enabled: boolean): Promise<void> => {
+    return ipcRenderer.invoke('settings:set-auto-start', enabled)
+  },
+
+  onSettingsChanged: (callback: (settings: SettingsSchema) => void): (() => void) => {
+    const listener = (_event: Electron.IpcRendererEvent, settings: SettingsSchema) => {
+      callback(settings)
+    }
+    ipcRenderer.on('settings-changed', listener)
+    return () => ipcRenderer.removeListener('settings-changed', listener)
   }
 })

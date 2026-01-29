@@ -3,6 +3,11 @@ export interface AuthState {
   userIdentifier: string | null
 }
 
+export interface SettingsSchema {
+  pollingIntervalMinutes: number
+  autoStartEnabled: boolean
+}
+
 export interface UsageLimit {
   current: number
   total: number
@@ -38,6 +43,11 @@ export interface ElectronAPI {
   getUsageData: () => Promise<UsageState>
   refreshUsageData: () => Promise<UsageState>
   onUsageDataChanged: (callback: (data: UsageData) => void) => () => void
+  // Settings methods
+  getSettings: () => Promise<SettingsSchema>
+  setPollingInterval: (minutes: number) => Promise<void>
+  setAutoStart: (enabled: boolean) => Promise<void>
+  onSettingsChanged: (callback: (settings: SettingsSchema) => void) => () => void
 }
 
 declare global {

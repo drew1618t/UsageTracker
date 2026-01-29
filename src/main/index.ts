@@ -11,7 +11,7 @@ import {
   persistSessionCookies
 } from './auth'
 import { getUsageData, refreshUsageData } from './state/usage'
-import { initSettings } from './state/settings'
+import { initSettings, getSettings, setPollingInterval, setAutoStart } from './state/settings'
 import { startPolling, stopPolling } from './state/polling'
 
 // Request single instance lock
@@ -90,6 +90,15 @@ if (!gotTheLock) {
     ipcMain.handle('usage:refresh', async () => {
       await refreshUsageData()
       return getUsageData()
+    })
+
+    // Settings IPC handlers
+    ipcMain.handle('settings:get', () => getSettings())
+    ipcMain.handle('settings:set-polling-interval', (_event, minutes: number) => {
+      setPollingInterval(minutes)
+    })
+    ipcMain.handle('settings:set-auto-start', (_event, enabled: boolean) => {
+      setAutoStart(enabled)
     })
 
     // Create system tray
