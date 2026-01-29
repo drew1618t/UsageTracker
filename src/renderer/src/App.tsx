@@ -1,9 +1,31 @@
 import React, { useEffect, useState } from 'react'
 import './App.css'
+import { UsageDisplay } from './components/UsageDisplay'
 
 interface AuthState {
   isAuthenticated: boolean
   userIdentifier: string | null
+}
+
+interface UsageLimit {
+  current: number
+  total: number
+  percentage: number
+  resetAt: string
+}
+
+interface UsageData {
+  sessionLimit: UsageLimit
+  weeklyAllModels: UsageLimit
+  weeklySonnet: UsageLimit
+  fetchedAt: string
+}
+
+interface UsageState {
+  data: UsageData | null
+  lastUpdated: Date | null
+  error: string | null
+  isLoading: boolean
 }
 
 function App() {
@@ -13,6 +35,12 @@ function App() {
     userIdentifier: null
   })
   const [isLoggingIn, setIsLoggingIn] = useState(false)
+  const [usageState, setUsageState] = useState<UsageState>({
+    data: null,
+    lastUpdated: null,
+    error: null,
+    isLoading: false
+  })
 
   useEffect(() => {
     // Fetch app version on mount
@@ -26,17 +54,60 @@ function App() {
     })
 
     // Subscribe to auth state changes
-    const cleanup = window.electronAPI.onAuthStateChanged((state) => {
+    const cleanupAuth = window.electronAPI.onAuthStateChanged((state) => {
       setAuthState(state)
       setIsLoggingIn(false)
     })
 
-    return cleanup
+    // Get initial usage data
+    window.electronAPI.getUsageData().then((state) => {
+      setUsageState({
+        data: state.data,
+        lastUpdated: state.lastUpdated,
+        error: state.error,
+        isLoading: false
+      })
+    })
+
+    // Subscribe to usage data changes
+    const cleanupUsage = window.electronAPI.onUsageDataChanged((data) => {
+      setUsageState((prev) => ({
+        ...prev,
+        data,
+        lastUpdated: new Date(),
+        error: null,
+        isLoading: false
+      }))
+    })
+
+    return () => {
+      cleanupAuth()
+      cleanupUsage()
+    }
   }, [])
 
   const handleLogin = async () => {
     setIsLoggingIn(true)
     await window.electronAPI.login()
+  }
+
+  const handleRefresh = async () => {
+    setUsageState((prev) => ({ ...prev, isLoading: true }))
+    try {
+      const result = await window.electronAPI.refreshUsageData()
+      setUsageState({
+        data: result.data,
+        lastUpdated: result.lastUpdated,
+        error: result.error,
+        isLoading: false
+      })
+    } catch (error) {
+      setUsageState((prev) => ({
+        ...prev,
+        error: error instanceof Error ? error.message : 'Failed to refresh',
+        isLoading: false
+      }))
+    }
   }
 
   return (
@@ -66,9 +137,13 @@ function App() {
             </button>
           </div>
         ) : (
-          <div className="placeholder-message">
-            <p>No usage data yet.</p>
-          </div>
+          <UsageDisplay
+            data={usageState.data}
+            lastUpdated={usageState.lastUpdated}
+            error={usageState.error}
+            isLoading={usageState.isLoading}
+            onRefresh={handleRefresh}
+          />
         )}
       </main>
 
