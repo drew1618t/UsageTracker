@@ -11,6 +11,8 @@ import {
   persistSessionCookies
 } from './auth'
 import { getUsageData, refreshUsageData } from './state/usage'
+import { initSettings } from './state/settings'
+import { startPolling, stopPolling } from './state/polling'
 
 // Request single instance lock
 const gotTheLock = app.requestSingleInstanceLock()
@@ -49,6 +51,9 @@ if (!gotTheLock) {
 
   // Initialize app when ready
   app.whenReady().then(async () => {
+    // Initialize settings
+    initSettings()
+
     // Initialize auth session with callback for when auth cookies are detected
     initSession(async () => {
       console.log('Auth cookies detected')
@@ -58,6 +63,8 @@ if (!gotTheLock) {
         isAuthenticated: authStateResult.isAuthenticated,
         userIdentifier: authStateResult.userEmail || null
       })
+      // Start polling when auth cookies detected
+      startPolling()
     })
 
     // Register IPC handlers
@@ -73,6 +80,7 @@ if (!gotTheLock) {
       await openLoginPage()
     })
     ipcMain.handle('auth:logout', async () => {
+      stopPolling()
       await logout()
       setAuthState({ isAuthenticated: false, userIdentifier: null })
     })
@@ -95,10 +103,16 @@ if (!gotTheLock) {
       userIdentifier: authStateResult.userEmail || null
     })
     console.log('Initial auth state:', authStateResult)
+
+    // Start polling if already authenticated
+    if (authStateResult.isAuthenticated) {
+      startPolling()
+    }
   })
 
   // Clean up before quit
   app.on('before-quit', () => {
+    stopPolling()
     console.log('App quitting...')
   })
 }

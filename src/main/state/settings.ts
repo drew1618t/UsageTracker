@@ -1,6 +1,7 @@
-import Store from 'electron-store'
-import { app } from 'electron'
-import { BrowserWindow } from 'electron'
+import { app, BrowserWindow } from 'electron'
+// Using require for electron-store due to ESM/CJS compatibility
+const ElectronStoreModule = require('electron-store')
+const ElectronStore = ElectronStoreModule.default || ElectronStoreModule
 
 interface SettingsSchema {
   pollingIntervalMinutes: number
@@ -20,7 +21,7 @@ const schema = {
   }
 } as const
 
-const store = new Store<SettingsSchema>({
+const store = new ElectronStore<SettingsSchema>({
   schema,
   defaults: {
     pollingIntervalMinutes: 5,
