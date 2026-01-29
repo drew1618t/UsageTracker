@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-27)
 
 **Core value:** See how close you are to your Claude usage limits without leaving what you're doing — one glance at the system tray tells you if you're good, getting close, or tapped out.
-**Current focus:** Phase 3 - Data Fetching + Display
+**Current focus:** Phase 3 - Data Fetching + Display (Complete)
 
 ## Current Position
 
 Phase: 3 of 4 (Data Fetching + Display)
-Plan: 1 of 3 in current phase
-Status: In progress
-Last activity: 2026-01-29 — Completed 03-01-PLAN.md
+Plan: 3 of 3 in current phase
+Status: Complete - human verified
+Last activity: 2026-01-29 — Phase 3 complete, all plans executed and verified
 
-Progress: [█████░░░░░] 50%
+Progress: [███████░░░] 75%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 5
-- Average duration: 32 min
-- Total execution time: 2.42 hours
+- Total plans completed: 7
+- Average duration: 20 min
+- Total execution time: 2.75 hours
 
 **By Phase:**
 
@@ -29,11 +29,11 @@ Progress: [█████░░░░░] 50%
 |-------|-------|-------|----------|
 | 01-electron-shell-tray-foundation | 2 | 86 min | 43 min |
 | 02-browser-authentication | 2 | 49 min | 25 min |
-| 03-data-fetching-display | 1 | 3 min | 3 min |
+| 03-data-fetching-display | 3 | 30 min | 10 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-02 (82 min), 02-01 (4 min), 02-02 (45 min), 03-01 (3 min)
-- Trend: Phase 3 first plan executed quickly - backend data infrastructure
+- Last 5 plans: 02-01 (4 min), 02-02 (45 min), 03-01 (3 min), 03-02 (2 min), 03-03 (25 min)
+- Trend: Phase 3 completed - third plan took longer due to API endpoint discovery and debugging
 
 *Updated after each plan completion*
 
@@ -82,18 +82,29 @@ Recent decisions affecting current work:
 - Push updates architecture: broadcast usage data changes to all renderer windows
 - IPC namespace pattern: usage:* prefix for all usage-related handlers (consistent with auth:*)
 
+**From 03-02 execution:**
+- Green-yellow-red gradient thresholds at 70% and 90% usage
+- Most-limiting constraint highlighted with yellow border
+- Absolute time display with relative duration on hover
+
+**From 03-03 execution:**
+- API endpoint: https://claude.ai/api/organizations/{org_id}/usage
+- Get org_id from lastActiveOrg cookie
+- Use net.request with useSessionCookies (not net.fetch) for reliable cookie handling with custom session partitions
+- Tooltip shows which limit is most limiting (e.g., "Claude: Weekly 79%")
+
 ### Pending Todos
 
-None yet.
+None.
 
 ### Blockers/Concerns
 
-None yet.
+None.
 
 ## Session Continuity
 
 Last session: 2026-01-29 (plan execution)
-Stopped at: Completed 03-01-PLAN.md
+Stopped at: Completed Phase 3 (Data Fetching + Display)
 Resume file: None
 
-**Phase 3 Progress:** Backend data infrastructure complete. Ready for UI implementation in plan 03-02.
+**Phase 3 Complete:** Usage data fetching and display verified end-to-end. Phase 4 (Background Polling + Settings) ready to plan.
