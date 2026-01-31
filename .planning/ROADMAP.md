@@ -32,6 +32,12 @@
 - Icon color: Keep existing threshold logic but apply to all limits independently
 - Auto-start: Likely registry entry pointing to wrong path; needs app path not electron.exe
 
+**Plans:** 2 plans
+
+Plans:
+- [ ] 05-01-PLAN.md — Create display logic utility and fix auto-start dev mode
+- [ ] 05-02-PLAN.md — Integrate display logic into tray and popup
+
 **Dependencies:** None (v1.0 foundation complete)
 
 ---
