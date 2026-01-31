@@ -4,6 +4,7 @@ import { togglePopupWindow } from './window'
 import { getAuthState } from './auth/state'
 import { openLoginPage, logout, setAuthState } from './auth'
 import type { UsageData } from './api/types'
+import { selectPrimaryLimit, determineTrayIconColor } from './utils/displayLogic'
 
 export let tray: Tray | null = null
 
@@ -166,26 +167,18 @@ export function updateTrayIcon(status: 'green' | 'yellow' | 'red'): void {
 export function updateTrayForUsage(data: UsageData): void {
   if (!tray || tray.isDestroyed()) return
 
-  // Find most limiting constraint (highest percentage)
-  const limits = [
-    { name: 'Session', percentage: data.sessionLimit.percentage },
-    { name: 'Weekly', percentage: data.weeklyAllModels.percentage },
-    { name: 'Sonnet', percentage: data.weeklySonnet.percentage }
-  ]
+  // Use display logic to determine primary limit for tooltip
+  const { limit: primaryLimit, type: primaryType } = selectPrimaryLimit(
+    data.sessionLimit,
+    data.weeklyAllModels
+  )
 
-  // Sort by percentage descending to find most limiting
-  limits.sort((a, b) => b.percentage - a.percentage)
-  const mostLimiting = limits[0]
-
-  // Determine icon color based on thresholds
-  let iconColor: 'green' | 'yellow' | 'red'
-  if (mostLimiting.percentage >= 90) {
-    iconColor = 'red'
-  } else if (mostLimiting.percentage >= 70) {
-    iconColor = 'yellow'
-  } else {
-    iconColor = 'green'
-  }
+  // Determine icon color based on ANY limit hitting threshold
+  const iconColor = determineTrayIconColor(
+    data.sessionLimit,
+    data.weeklyAllModels,
+    data.weeklySonnet
+  )
 
   // Update icon
   const isDev = !app.isPackaged
@@ -196,7 +189,8 @@ export function updateTrayForUsage(data: UsageData): void {
   const icon = nativeImage.createFromPath(iconPath)
   tray.setImage(icon)
 
-  // Update tooltip with usage summary - show which limit is highest
-  const tooltip = `Claude: ${mostLimiting.name} ${Math.round(mostLimiting.percentage)}%`
+  // Update tooltip with primary limit
+  const limitName = primaryType === 'session' ? 'Session' : 'Weekly'
+  const tooltip = `Claude: ${limitName} ${Math.round(primaryLimit.percentage)}%`
   tray.setToolTip(tooltip)
 }
