@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-31)
 ## Current Position
 
 Phase: 5 of 5 — Display Logic & Fixes
-Plan: 1 of 3 complete
+Plan: 2 of 3 complete
 Status: In progress
-Last activity: 2026-01-31 — Completed 05-01-PLAN.md
+Last activity: 2026-01-31 — Completed 05-02-PLAN.md
 
-Progress: [██████████] 10/10 plans complete (v1.0 + 1 v1.1 plan)
+Progress: [███████████] 11/13 plans complete (v1.0 + 2 v1.1 plans)
 
 ## Velocity Stats
 
 **Overall (v1.0 + v1.1):**
-- Total plans completed: 10
-- Average duration: 15.9 min
-- Total execution time: 2.99 hours
+- Total plans completed: 11
+- Average duration: 13.5 min
+- Total execution time: 2.48 hours
 
 **By Phase:**
 
@@ -31,7 +31,7 @@ Progress: [██████████] 10/10 plans complete (v1.0 + 1 v1.1 p
 | 02-browser-authentication | 2 | 49 min | 25 min |
 | 03-data-fetching-display | 3 | 30 min | 10 min |
 | 04-background-polling-settings | 2 | 17 min | 8.5 min |
-| 05-display-logic-fixes | 1 | 2 min | 2 min |
+| 05-display-logic-fixes | 2 | 7 min | 3.5 min |
 
 ## Accumulated Context
 
@@ -42,6 +42,8 @@ Progress: [██████████] 10/10 plans complete (v1.0 + 1 v1.1 p
 | Session-first display with weekly override only when >90% and more limiting | 05-01 | Users care most about current session, but need warning when weekly is critically low |
 | Tray icon color based on ANY limit hitting threshold (independent evaluation) | 05-01 | Tray should reflect ANY limit reaching threshold, not just primary display |
 | Dev mode detection via app.isPackaged | 05-01 | Prevents electron.exe registry entries during development |
+| Inline selectPrimaryLimit in renderer (can't import from main process) | 05-02 | Renderer cannot import main process utilities, chose code duplication over cross-process complexity |
+| Fixed display order with dynamic highlighting in popup | 05-02 | Consistent UI positioning is better UX than shifting bars based on percentage |
 
 Additional decisions logged in PROJECT.md Key Decisions table.
 
@@ -55,6 +57,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-01-31T12:47:52Z
-Stopped at: Completed 05-01-PLAN.md
+Last session: 2026-01-31T12:56:26Z
+Stopped at: Completed 05-02-PLAN.md
 Resume file: None
