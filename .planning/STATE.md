@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-01-31)
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-01-31 — Milestone v1.1 started
+Phase: 5 — Display Logic & Fixes
+Plan: Not started
+Status: Ready to plan
+Last activity: 2026-01-31 — Roadmap created
 
-Progress: [░░░░░░░░░░] v1.1 starting
+Progress: [░░░░░░░░░░] Phase 5 ready
 
 ## v1.0 Stats
 
@@ -48,6 +48,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-01-31 (milestone start)
-Stopped at: Defining v1.1 requirements
+Last session: 2026-01-31 (roadmap created)
+Stopped at: Ready to plan Phase 5
 Resume file: None
