@@ -9,19 +9,19 @@ See: .planning/PROJECT.md (updated 2026-01-31)
 
 ## Current Position
 
-Phase: 5 — Display Logic & Fixes
-Plan: Not started
-Status: Ready to plan
-Last activity: 2026-01-31 — Roadmap created
+Phase: 5 of 5 — Display Logic & Fixes
+Plan: 1 of 3 complete
+Status: In progress
+Last activity: 2026-01-31 — Completed 05-01-PLAN.md
 
-Progress: [░░░░░░░░░░] Phase 5 ready
+Progress: [██████████] 10/10 plans complete (v1.0 + 1 v1.1 plan)
 
-## v1.0 Stats
+## Velocity Stats
 
-**Velocity:**
-- Total plans completed: 9
-- Average duration: 17 min
-- Total execution time: 2.97 hours
+**Overall (v1.0 + v1.1):**
+- Total plans completed: 10
+- Average duration: 15.9 min
+- Total execution time: 2.99 hours
 
 **By Phase:**
 
@@ -31,12 +31,19 @@ Progress: [░░░░░░░░░░] Phase 5 ready
 | 02-browser-authentication | 2 | 49 min | 25 min |
 | 03-data-fetching-display | 3 | 30 min | 10 min |
 | 04-background-polling-settings | 2 | 17 min | 8.5 min |
+| 05-display-logic-fixes | 1 | 2 min | 2 min |
 
 ## Accumulated Context
 
 ### Decisions
 
-Key decisions are logged in PROJECT.md Key Decisions table.
+| Decision | Phase | Rationale |
+|----------|-------|-----------|
+| Session-first display with weekly override only when >90% and more limiting | 05-01 | Users care most about current session, but need warning when weekly is critically low |
+| Tray icon color based on ANY limit hitting threshold (independent evaluation) | 05-01 | Tray should reflect ANY limit reaching threshold, not just primary display |
+| Dev mode detection via app.isPackaged | 05-01 | Prevents electron.exe registry entries during development |
+
+Additional decisions logged in PROJECT.md Key Decisions table.
 
 ### Pending Todos
 
@@ -48,6 +55,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-01-31 (roadmap created)
-Stopped at: Ready to plan Phase 5
+Last session: 2026-01-31T12:47:52Z
+Stopped at: Completed 05-01-PLAN.md
 Resume file: None
