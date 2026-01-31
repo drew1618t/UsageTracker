@@ -33,6 +33,40 @@ const LIMIT_LABELS: Record<string, string> = {
   weeklySonnet: 'Weekly (Sonnet)'
 }
 
+/**
+ * Selects the primary limit to display, defaulting to session but switching to weekly
+ * when weekly is >90% AND more limiting in session-equivalent units.
+ * (Renderer-side copy of displayLogic.selectPrimaryLimit)
+ */
+function selectPrimaryLimit(
+  sessionLimit: UsageLimit,
+  weeklyLimit: UsageLimit
+): { limit: UsageLimit; type: 'session' | 'weekly' } {
+  // Default to session
+  if (weeklyLimit.percentage <= 90) {
+    return { limit: sessionLimit, type: 'session' }
+  }
+
+  // Weekly is >90%, check if it's more limiting in final 10%
+  // Validate totals to avoid division by zero
+  if (weeklyLimit.total <= 0 || sessionLimit.total <= 0) {
+    return { limit: sessionLimit, type: 'session' }
+  }
+
+  const weeklyRemaining = weeklyLimit.total - weeklyLimit.current
+  const sessionRemaining = sessionLimit.total - sessionLimit.current
+
+  // Convert weekly remaining to session-equivalent units
+  // Formula: weekly remaining sessions = weekly remaining / (weekly total / 10 sessions)
+  const weeklyRemainingInSessions = weeklyRemaining / (weeklyLimit.total / 10)
+
+  if (weeklyRemainingInSessions < sessionRemaining) {
+    return { limit: weeklyLimit, type: 'weekly' }
+  }
+
+  return { limit: sessionLimit, type: 'session' }
+}
+
 export function UsageDisplay({
   data,
   lastUpdated,
@@ -63,15 +97,21 @@ export function UsageDisplay({
     )
   }
 
-  // Sort limits by percentage (most-limiting first)
+  // Determine which limit is primary (session-first with smart weekly override)
+  const { type: primaryType } = selectPrimaryLimit(
+    data.sessionLimit,
+    data.weeklyAllModels
+  )
+
+  // Determine which key should be marked as limiting
+  const limitingKey = primaryType === 'session' ? 'sessionLimit' : 'weeklyAllModels'
+
+  // Fixed order: Session first, then Weekly (All Models), then Weekly (Sonnet)
   const limits = [
     { key: 'sessionLimit', ...data.sessionLimit },
     { key: 'weeklyAllModels', ...data.weeklyAllModels },
     { key: 'weeklySonnet', ...data.weeklySonnet }
-  ].sort((a, b) => b.percentage - a.percentage)
-
-  // The first one after sorting is the most limiting
-  const mostLimitingKey = limits[0].key
+  ]
 
   return (
     <div className="usage-display">
@@ -94,7 +134,7 @@ export function UsageDisplay({
             current={limit.current}
             total={limit.total}
             resetAt={new Date(limit.resetAt)}
-            isLimiting={limit.key === mostLimitingKey}
+            isLimiting={limit.key === limitingKey}
           />
         ))}
       </div>
