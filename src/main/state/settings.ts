@@ -45,7 +45,15 @@ export function setPollingInterval(minutes: number): void {
 }
 
 export function setAutoStart(enabled: boolean): void {
+  const isDev = !app.isPackaged
   store.set('autoStartEnabled', enabled)
+
+  // Skip auto-start in development mode to prevent electron.exe registry entries
+  if (isDev) {
+    console.log('[Settings] Skipping auto-start in dev mode')
+    notifySettingsChanged()
+    return
+  }
 
   // Update Windows auto-start setting
   app.setLoginItemSettings({
@@ -58,13 +66,18 @@ export function setAutoStart(enabled: boolean): void {
 }
 
 export function initSettings(): void {
-  // Sync Windows auto-start state on startup
-  const loginItemSettings = app.getLoginItemSettings()
-  const currentAutoStart = store.get('autoStartEnabled')
+  const isDev = !app.isPackaged
 
-  // If Windows setting differs from stored setting, update stored setting to match reality
-  if (loginItemSettings.openAtLogin !== currentAutoStart) {
-    store.set('autoStartEnabled', loginItemSettings.openAtLogin)
+  // Skip syncing Windows registry in dev mode (registry state is unreliable in dev)
+  if (!isDev) {
+    // Sync Windows auto-start state on startup
+    const loginItemSettings = app.getLoginItemSettings()
+    const currentAutoStart = store.get('autoStartEnabled')
+
+    // If Windows setting differs from stored setting, update stored setting to match reality
+    if (loginItemSettings.openAtLogin !== currentAutoStart) {
+      store.set('autoStartEnabled', loginItemSettings.openAtLogin)
+    }
   }
 
   console.log('[Settings] Initialized:', getSettings())
