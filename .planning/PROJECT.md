@@ -2,7 +2,7 @@
 
 ## What This Is
 
-A Windows system tray application that displays Claude.ai usage limits at a glance with color-coded indicators, browser-based authentication, and configurable background polling. The tray icon reflects the most limiting usage constraint, and clicking it reveals a popup with three progress bars showing session, weekly all-models, and weekly Sonnet limits with reset countdowns.
+A Windows system tray application that displays Claude.ai usage limits at a glance with color-coded indicators, browser-based authentication, and configurable background polling. The tray icon reflects usage status across all limits, and clicking it reveals a popup with three progress bars showing session, weekly all-models, and weekly Sonnet limits with reset countdowns. Session limit is shown by default, with smart weekly override when weekly becomes more constraining.
 
 ## Core Value
 
@@ -27,15 +27,14 @@ See how close you are to your Claude usage limits without leaving what you're do
 - ✓ POLL-02: Manual refresh from popup and context menu — v1.0
 - ✓ POLL-03: Configurable polling interval (1-30 min) — v1.0
 - ✓ POLL-04: Auto-start with Windows boot — v1.0
+- ✓ DISPLAY-01: Session limit shown by default in popup and tooltip — v1.1
+- ✓ DISPLAY-02: Weekly limit takes priority only when >90% used AND more limiting in final 10% — v1.1
+- ✓ DISPLAY-03: Tray icon color reflects ANY limit hitting thresholds (early warning) — v1.1
+- ✓ FIX-01: Auto-start launches app correctly (not bare electron.exe) — v1.1
 
 ### Active
 
-**Current Milestone: v1.1 Polish & Fixes**
-
-- [ ] DISPLAY-01: Session limit shown by default in popup and tooltip
-- [ ] DISPLAY-02: Weekly limit takes priority only when >90% used AND more limiting in final 10%
-- [ ] DISPLAY-03: Tray icon color reflects ANY limit hitting thresholds (early warning)
-- [ ] FIX-01: Auto-start launches app correctly (not bare electron.exe)
+None — planning next milestone.
 
 ### Out of Scope
 
@@ -47,12 +46,12 @@ See how close you are to your Claude usage limits without leaving what you're do
 
 ## Context
 
-**Current state:** Shipped v1.0 with ~1,829 LOC TypeScript.
+**Current state:** Shipped v1.1 with ~1,941 LOC TypeScript.
 
 **Tech stack:** Electron + electron-vite, React, TypeScript, electron-store, exponential-backoff, date-fns.
 
 **Architecture:**
-- Main process: tray management, auth session handling, usage API polling, settings persistence
+- Main process: tray management, auth session handling, usage API polling, settings persistence, display logic utilities
 - Preload: secure IPC bridge via contextBridge
 - Renderer: React popup with usage display and settings UI
 
@@ -80,7 +79,11 @@ See how close you are to your Claude usage limits without leaving what you're do
 | electron-store for settings | De-facto standard for Electron, simple persistence | ✓ Good |
 | Recursive setTimeout for polling | Allows dynamic interval changes without restart | ✓ Good |
 | Exponential backoff with auth error detection | Prevents aggressive retry loops on auth failures | ✓ Good |
-| Session-first display logic | Session is the day-to-day constraint; weekly only matters when nearly exhausted | — Pending |
+| Session-first display logic | Session is the day-to-day constraint; weekly only matters when nearly exhausted | ✓ Good |
+| Independent icon color evaluation | Icon should warn about ANY limit, not just displayed one | ✓ Good |
+| Inline renderer logic (vs shared import) | Renderer can't import from main; code duplication is simpler than IPC | ✓ Good |
+| Fixed popup order with dynamic highlighting | Consistent UI positioning; highlight moves, bars don't | ✓ Good |
+| Dev mode auto-start protection | Prevents electron.exe registry pollution during development | ✓ Good |
 
 ---
-*Last updated: 2026-01-31 after v1.1 milestone start*
+*Last updated: 2026-01-31 after v1.1 milestone complete*
