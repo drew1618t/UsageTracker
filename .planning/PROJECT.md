@@ -32,8 +32,9 @@ See how close you are to your Claude usage limits without leaving what you're do
 
 **Current Milestone: v1.1 Polish & Fixes**
 
-- [ ] DISPLAY-01: Session limit shown by default; weekly only when >90% or more limiting in final 10%
-- [ ] DISPLAY-02: Tray icon color still reflects weekly thresholds for early warning
+- [ ] DISPLAY-01: Session limit shown by default in popup and tooltip
+- [ ] DISPLAY-02: Weekly limit takes priority only when >90% used AND more limiting in final 10%
+- [ ] DISPLAY-03: Tray icon color reflects ANY limit hitting thresholds (early warning)
 - [ ] FIX-01: Auto-start launches app correctly (not bare electron.exe)
 
 ### Out of Scope
