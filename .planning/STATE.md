@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-31)
 
 **Core value:** See how close you are to your Claude usage limits without leaving what you're doing — one glance at the system tray tells you if you're good, getting close, or tapped out.
-**Current focus:** v1.1 Polish & Fixes
+**Current focus:** v1.1 Polish & Fixes — COMPLETE
 
 ## Current Position
 
-Phase: 5 of 5 — Display Logic & Fixes
-Plan: 2 of 3 complete
-Status: In progress
-Last activity: 2026-01-31 — Completed 05-02-PLAN.md
+Phase: 5 of 5 — Display Logic & Fixes ✓
+Plan: All complete
+Status: Milestone v1.1 complete
+Last activity: 2026-01-31 — Phase 5 verified
 
-Progress: [███████████] 11/13 plans complete (v1.0 + 2 v1.1 plans)
+Progress: [████████████] 13/13 plans complete (v1.0 + v1.1)
 
 ## Velocity Stats
 
 **Overall (v1.0 + v1.1):**
-- Total plans completed: 11
-- Average duration: 13.5 min
-- Total execution time: 2.48 hours
+- Total plans completed: 13
+- Average duration: 14 min
+- Total execution time: 3.05 hours
 
 **By Phase:**
 
@@ -55,8 +55,18 @@ None.
 
 None.
 
+## Milestone v1.1 Summary
+
+**All requirements complete:**
+- DISPLAY-01: Session limit shown by default ✓
+- DISPLAY-02: Weekly limit priority when >90% AND more limiting ✓
+- DISPLAY-03: Tray icon reflects ANY limit hitting threshold ✓
+- FIX-01: Auto-start dev mode protection ✓
+
+**Verification:** All 8 must-haves verified against codebase
+
 ## Session Continuity
 
-Last session: 2026-01-31T12:56:26Z
-Stopped at: Completed 05-02-PLAN.md
+Last session: 2026-01-31
+Stopped at: Milestone v1.1 complete
 Resume file: None

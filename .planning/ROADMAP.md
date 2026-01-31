@@ -8,7 +8,7 @@
 
 | # | Phase | Goal | Requirements | Status |
 |---|-------|------|--------------|--------|
-| 5 | Display Logic & Fixes | Session-first display with smart weekly priority, fix auto-start | DISPLAY-01, DISPLAY-02, DISPLAY-03, FIX-01 | ○ Pending |
+| 5 | Display Logic & Fixes | Session-first display with smart weekly priority, fix auto-start | DISPLAY-01, DISPLAY-02, DISPLAY-03, FIX-01 | ✓ Complete |
 
 ## Phase 5: Display Logic & Fixes
 
@@ -35,8 +35,8 @@
 **Plans:** 2 plans
 
 Plans:
-- [ ] 05-01-PLAN.md — Create display logic utility and fix auto-start dev mode
-- [ ] 05-02-PLAN.md — Integrate display logic into tray and popup
+- [x] 05-01-PLAN.md — Create display logic utility and fix auto-start dev mode
+- [x] 05-02-PLAN.md — Integrate display logic into tray and popup
 
 **Dependencies:** None (v1.0 foundation complete)
 

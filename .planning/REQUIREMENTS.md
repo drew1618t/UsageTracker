@@ -9,13 +9,13 @@ Requirements for polish/fixes release. Focus on smarter display logic and bug fi
 
 ### Display Logic
 
-- [ ] **DISPLAY-01**: Session limit shown by default in popup and tooltip
-- [ ] **DISPLAY-02**: Weekly limit takes priority only when >90% used AND more limiting in final 10%
-- [ ] **DISPLAY-03**: Tray icon color reflects ANY limit hitting thresholds (early warning)
+- [x] **DISPLAY-01**: Session limit shown by default in popup and tooltip
+- [x] **DISPLAY-02**: Weekly limit takes priority only when >90% used AND more limiting in final 10%
+- [x] **DISPLAY-03**: Tray icon color reflects ANY limit hitting thresholds (early warning)
 
 ### Bug Fixes
 
-- [ ] **FIX-01**: Auto-start launches app correctly (not bare electron.exe)
+- [x] **FIX-01**: Auto-start launches app correctly (not bare electron.exe)
 
 ## Future Requirements
 
@@ -33,10 +33,10 @@ None identified for this milestone.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DISPLAY-01 | Phase 5 | Pending |
-| DISPLAY-02 | Phase 5 | Pending |
-| DISPLAY-03 | Phase 5 | Pending |
-| FIX-01 | Phase 5 | Pending |
+| DISPLAY-01 | Phase 5 | Complete |
+| DISPLAY-02 | Phase 5 | Complete |
+| DISPLAY-03 | Phase 5 | Complete |
+| FIX-01 | Phase 5 | Complete |
 
 **Coverage:**
 - v1.1 requirements: 4 total
