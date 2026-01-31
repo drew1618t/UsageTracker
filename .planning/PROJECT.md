@@ -30,7 +30,11 @@ See how close you are to your Claude usage limits without leaving what you're do
 
 ### Active
 
-(Define in next milestone)
+**Current Milestone: v1.1 Polish & Fixes**
+
+- [ ] DISPLAY-01: Session limit shown by default; weekly only when >90% or more limiting in final 10%
+- [ ] DISPLAY-02: Tray icon color still reflects weekly thresholds for early warning
+- [ ] FIX-01: Auto-start launches app correctly (not bare electron.exe)
 
 ### Out of Scope
 
@@ -75,6 +79,7 @@ See how close you are to your Claude usage limits without leaving what you're do
 | electron-store for settings | De-facto standard for Electron, simple persistence | ✓ Good |
 | Recursive setTimeout for polling | Allows dynamic interval changes without restart | ✓ Good |
 | Exponential backoff with auth error detection | Prevents aggressive retry loops on auth failures | ✓ Good |
+| Session-first display logic | Session is the day-to-day constraint; weekly only matters when nearly exhausted | — Pending |
 
 ---
-*Last updated: 2026-01-29 after v1.0 milestone*
+*Last updated: 2026-01-31 after v1.1 milestone start*

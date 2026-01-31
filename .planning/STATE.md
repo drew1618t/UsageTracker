@@ -2,19 +2,19 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-01-29)
+See: .planning/PROJECT.md (updated 2026-01-31)
 
 **Core value:** See how close you are to your Claude usage limits without leaving what you're doing — one glance at the system tray tells you if you're good, getting close, or tapped out.
-**Current focus:** Planning next milestone
+**Current focus:** v1.1 Polish & Fixes
 
 ## Current Position
 
-Phase: v1.0 complete — ready for next milestone
-Plan: Not started
-Status: Ready to plan
-Last activity: 2026-01-29 — v1.0 milestone archived
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-01-31 — Milestone v1.1 started
 
-Progress: [██████████] v1.0 shipped
+Progress: [░░░░░░░░░░] v1.1 starting
 
 ## v1.0 Stats
 
@@ -48,8 +48,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-01-29 (milestone completion)
-Stopped at: v1.0 milestone archived
+Last session: 2026-01-31 (milestone start)
+Stopped at: Defining v1.1 requirements
 Resume file: None
-
-**Milestone shipped:** v1.0 archived to `.planning/milestones/`. Use `/gsd:new-milestone` to start next milestone.
