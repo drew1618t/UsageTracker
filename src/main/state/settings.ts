@@ -58,8 +58,9 @@ export function setAutoStart(enabled: boolean): void {
   // Update Windows auto-start setting
   app.setLoginItemSettings({
     openAtLogin: enabled,
-    openAsHidden: false,
-    path: process.execPath
+    openAsHidden: true,
+    path: process.execPath,
+    args: ['--hidden']
   })
 
   notifySettingsChanged()
