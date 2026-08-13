@@ -24,6 +24,20 @@ export interface ProviderLimit {
   isAcknowledged?: boolean
 }
 
+/**
+ * Extra-usage credits, billed in money rather than a rolling percentage window.
+ * The usage API reports no reset timestamp for these, so none is tracked.
+ */
+export interface ProviderCredits {
+  usedMinor: number
+  limitMinor: number
+  currency: string
+  decimalPlaces: number
+  percentage: number
+  isEnabled: boolean
+  disabledReason?: string
+}
+
 export interface ProviderUsageData {
   providerId: ProviderId
   providerLabel: string
@@ -31,6 +45,8 @@ export interface ProviderUsageData {
   limits: ProviderLimit[]
   primaryLimitKey: string | null
   source: 'remote' | 'local'
+  // Kept out of `limits` so a maxed-out credit balance never drives tray colour
+  credits?: ProviderCredits | null
   metadata?: {
     planType?: string
     totalTokens?: number

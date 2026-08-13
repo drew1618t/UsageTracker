@@ -1,6 +1,6 @@
 import { net, session } from 'electron'
 import { selectPrimaryClaudeLimit } from '../utils/displayLogic'
-import type { ProviderUsageData, ProviderLimit } from '../../shared/types'
+import type { ProviderUsageData, ProviderLimit, ProviderCredits } from '../../shared/types'
 
 /**
  * Make an authenticated request using net.request (better cookie handling)
@@ -214,6 +214,33 @@ function transformUsageResponse(rawData: any): ProviderUsageData {
     fetchedAt: new Date().toISOString(),
     limits,
     primaryLimitKey,
-    source: 'remote'
+    source: 'remote',
+    credits: transformCredits(rawData.extra_usage)
+  }
+}
+
+/**
+ * Maps the API's extra_usage block into our credits shape.
+ * Amounts arrive in minor units (cents) alongside the exponent to scale by.
+ * Returns null when the account has never had credits, so nothing is shown.
+ */
+function transformCredits(raw: any): ProviderCredits | null {
+  if (!raw || typeof raw.used_credits !== 'number') {
+    return null
+  }
+
+  // An account that never enabled credits has no meaningful balance to show
+  if (raw.credits_ever_enabled === false && !raw.is_enabled) {
+    return null
+  }
+
+  return {
+    usedMinor: raw.used_credits,
+    limitMinor: typeof raw.monthly_limit === 'number' ? raw.monthly_limit : 0,
+    currency: raw.currency ?? 'USD',
+    decimalPlaces: typeof raw.decimal_places === 'number' ? raw.decimal_places : 2,
+    percentage: Math.round(raw.utilization ?? 0),
+    isEnabled: raw.is_enabled === true,
+    disabledReason: raw.disabled_reason ?? undefined
   }
 }

@@ -2,6 +2,7 @@ import { formatDistanceToNow } from 'date-fns'
 import { ProgressBar } from './ProgressBar'
 import './UsageDisplay.css'
 import type {
+  ProviderCredits,
   ProviderId,
   ProviderUsageState,
   UsageDashboardState
@@ -97,6 +98,8 @@ function ProviderUsageCard({
                 }
               />
             ))}
+
+            {data.credits && <CreditsBar credits={data.credits} />}
           </div>
 
           <div className="provider-meta">
@@ -115,6 +118,37 @@ function ProviderUsageCard({
       )}
     </section>
   )
+}
+
+/**
+ * Extra-usage credits shown as a spend meter. The API reports no reset for
+ * these, so the footer carries the dollar figures instead of a reset time.
+ */
+function CreditsBar({ credits }: { credits: ProviderCredits }) {
+  const used = formatMoney(credits.usedMinor, credits)
+  const limit = formatMoney(credits.limitMinor, credits)
+  const note = credits.isEnabled ? `${used} of ${limit}` : `${used} of ${limit}, off`
+
+  return (
+    <ProgressBar
+      label="Credits"
+      percentage={credits.percentage}
+      current={credits.usedMinor}
+      total={credits.limitMinor}
+      footerNote={note}
+      valueLabel={`${used} of ${limit}`}
+    />
+  )
+}
+
+/** Formats a minor-unit amount (cents) using the currency's exponent */
+function formatMoney(amountMinor: number, credits: ProviderCredits): string {
+  return new Intl.NumberFormat(undefined, {
+    style: 'currency',
+    currency: credits.currency,
+    minimumFractionDigits: credits.decimalPlaces,
+    maximumFractionDigits: credits.decimalPlaces
+  }).format(amountMinor / 10 ** credits.decimalPlaces)
 }
 
 function capitalize(value: string): string {

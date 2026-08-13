@@ -6,7 +6,9 @@ interface ProgressBarProps {
   percentage: number
   current: number
   total: number
-  resetAt: Date
+  resetAt?: Date          // Omitted for meters with no reset, e.g. credits
+  footerNote?: string     // Shown in place of the reset time
+  valueLabel?: string     // Overrides the raw current/total tooltip
   isLimiting?: boolean  // True for most-limiting constraint
   isAcknowledged?: boolean
   canAcknowledge?: boolean
@@ -19,6 +21,8 @@ export function ProgressBar({
   current,
   total,
   resetAt,
+  footerNote,
+  valueLabel,
   isLimiting = false,
   isAcknowledged = false,
   canAcknowledge = false,
@@ -42,13 +46,13 @@ export function ProgressBar({
     }
   }
 
-  // Format reset time
+  // Format reset time (absent on meters that never reset)
   const isWeeklyLimit = label.toLowerCase().includes('weekly')
-  const absoluteTime = format(resetAt, isWeeklyLimit ? 'EEE h:mm a' : 'h:mm a')
-  const relativeTime = formatDistanceToNow(resetAt, { addSuffix: true })  // "in 2 hours"
+  const absoluteTime = resetAt ? format(resetAt, isWeeklyLimit ? 'EEE h:mm a' : 'h:mm a') : null
+  const relativeTime = resetAt ? formatDistanceToNow(resetAt, { addSuffix: true }) : undefined
 
   // Tooltip text for absolute values
-  const tooltipText = `${current} / ${total}`
+  const tooltipText = valueLabel ?? `${current} / ${total}`
 
   return (
     <div
@@ -70,9 +74,12 @@ export function ProgressBar({
       </div>
 
       <div className="progress-footer">
-        <span className="reset-time" title={relativeTime}>
-          Resets at {absoluteTime}
-        </span>
+        {absoluteTime && (
+          <span className="reset-time" title={relativeTime}>
+            Resets at {absoluteTime}
+          </span>
+        )}
+        {footerNote && <span className="reset-time">{footerNote}</span>}
         {isAcknowledged && <span className="acknowledged-label">Acknowledged</span>}
         {canAcknowledge && onAcknowledge && (
           <button className="acknowledge-button" onClick={() => onAcknowledge()}>
