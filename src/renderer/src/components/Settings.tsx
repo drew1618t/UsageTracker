@@ -9,7 +9,6 @@ interface SettingsProps {
   onClose: () => void
 }
 
-// Interval presets for slider labels
 const INTERVAL_PRESETS = [1, 5, 10, 15, 30]
 
 export function Settings({ onClose }: SettingsProps) {
@@ -20,13 +19,11 @@ export function Settings({ onClose }: SettingsProps) {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    // Load initial settings
     window.electronAPI.getSettings().then((s) => {
       setSettings(s)
       setIsLoading(false)
     })
 
-    // Subscribe to settings changes
     const cleanup = window.electronAPI.onSettingsChanged((s) => {
       setSettings(s)
     })
@@ -54,7 +51,9 @@ export function Settings({ onClose }: SettingsProps) {
     <div className="settings-panel">
       <div className="settings-header">
         <h2>Settings</h2>
-        <button className="close-button" onClick={onClose}>×</button>
+        <button className="close-button" onClick={onClose}>
+          x
+        </button>
       </div>
 
       <div className="settings-content">

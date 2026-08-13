@@ -1,14 +1,8 @@
 const fs = require('fs')
 const path = require('path')
 
-// Files that are NOT needed for a simple tray app (no GPU, no video)
+// Keep renderer-critical GPU/ANGLE files. Removing them can crash packaged BrowserWindows.
 const UNNECESSARY_FILES = [
-  'dxcompiler.dll',      // 25MB - DirectX shader compiler
-  'dxil.dll',            // 1.5MB - DirectX IL
-  'vk_swiftshader.dll',  // 5.4MB - Vulkan software renderer
-  'vk_swiftshader_icd.json',
-  'vulkan-1.dll',        // 0.9MB - Vulkan loader
-  'ffmpeg.dll',          // 3MB - Video/audio codecs
   'LICENSES.chromium.html', // 16MB - License HTML (keep .txt)
 ]
 

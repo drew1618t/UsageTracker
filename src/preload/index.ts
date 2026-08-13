@@ -10,28 +10,45 @@ export interface AuthState {
 export interface SettingsSchema {
   pollingIntervalMinutes: number
   autoStartEnabled: boolean
+  acknowledgedLimits?: Record<string, string>
 }
 
-// Usage data interfaces
-export interface UsageLimit {
+export type ProviderId = 'claude' | 'codex'
+
+export interface ProviderLimit {
+  key: string
+  label: string
   current: number
   total: number
   percentage: number
   resetAt: string
+  isAcknowledged?: boolean
 }
 
-export interface UsageData {
-  sessionLimit: UsageLimit
-  weeklyAllModels: UsageLimit
-  weeklySonnet: UsageLimit
+export interface ProviderUsageData {
+  providerId: ProviderId
+  providerLabel: string
   fetchedAt: string
+  limits: ProviderLimit[]
+  primaryLimitKey: string | null
+  source: 'remote' | 'local'
+  metadata?: {
+    planType?: string
+    totalTokens?: number
+    lastTokens?: number
+  }
 }
 
-export interface UsageState {
-  data: UsageData | null
-  lastUpdated: Date | null
+export interface ProviderUsageState {
+  data: ProviderUsageData | null
+  lastUpdated: string | null
   error: string | null
   isLoading: boolean
+  statusLabel: string
+}
+
+export interface UsageDashboardState {
+  providers: Record<ProviderId, ProviderUsageState>
 }
 
 // Expose secure IPC bridge to renderer
@@ -84,16 +101,24 @@ contextBridge.exposeInMainWorld('electronAPI', {
   },
 
   // Usage data methods
-  getUsageData: (): Promise<UsageState> => {
-    return ipcRenderer.invoke('usage:get')
+  getUsageData: (): Promise<UsageDashboardState> => {
+    return ipcRenderer.invoke('usage:get-all')
   },
 
-  refreshUsageData: (): Promise<UsageState> => {
-    return ipcRenderer.invoke('usage:refresh')
+  refreshUsageData: (): Promise<UsageDashboardState> => {
+    return ipcRenderer.invoke('usage:refresh-all')
   },
 
-  onUsageDataChanged: (callback: (data: UsageData) => void): (() => void) => {
-    const listener = (_event: Electron.IpcRendererEvent, data: UsageData) => {
+  acknowledgeUsageLimit: (
+    providerId: ProviderId,
+    limitKey: string,
+    resetAt: string
+  ): Promise<UsageDashboardState> => {
+    return ipcRenderer.invoke('usage:acknowledge-limit', providerId, limitKey, resetAt)
+  },
+
+  onUsageDataChanged: (callback: (data: UsageDashboardState) => void): (() => void) => {
+    const listener = (_event: Electron.IpcRendererEvent, data: UsageDashboardState) => {
       callback(data)
     }
     ipcRenderer.on('usage-data-changed', listener)

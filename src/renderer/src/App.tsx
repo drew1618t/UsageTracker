@@ -8,25 +8,42 @@ interface AuthState {
   userIdentifier: string | null
 }
 
-interface UsageLimit {
+type ProviderId = 'claude' | 'codex'
+
+interface ProviderLimit {
+  key: string
+  label: string
   current: number
   total: number
   percentage: number
   resetAt: string
+  isAcknowledged?: boolean
 }
 
-interface UsageData {
-  sessionLimit: UsageLimit
-  weeklyAllModels: UsageLimit
-  weeklySonnet: UsageLimit
+interface ProviderUsageData {
+  providerId: ProviderId
+  providerLabel: string
   fetchedAt: string
+  limits: ProviderLimit[]
+  primaryLimitKey: string | null
+  source: 'remote' | 'local'
+  metadata?: {
+    planType?: string
+    totalTokens?: number
+    lastTokens?: number
+  }
 }
 
-interface UsageState {
-  data: UsageData | null
-  lastUpdated: Date | null
+interface ProviderUsageState {
+  data: ProviderUsageData | null
+  lastUpdated: string | null
   error: string | null
   isLoading: boolean
+  statusLabel: string
+}
+
+interface UsageDashboardState {
+  providers: Record<ProviderId, ProviderUsageState>
 }
 
 function App() {
@@ -37,49 +54,45 @@ function App() {
   })
   const [isLoggingIn, setIsLoggingIn] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
-  const [usageState, setUsageState] = useState<UsageState>({
-    data: null,
-    lastUpdated: null,
-    error: null,
-    isLoading: false
+  const [usageState, setUsageState] = useState<UsageDashboardState>({
+    providers: {
+      claude: {
+        data: null,
+        lastUpdated: null,
+        error: null,
+        isLoading: false,
+        statusLabel: 'Claude not logged in.'
+      },
+      codex: {
+        data: null,
+        lastUpdated: null,
+        error: null,
+        isLoading: false,
+        statusLabel: 'No recent Codex usage found.'
+      }
+    }
   })
 
   useEffect(() => {
-    // Fetch app version on mount
     window.electronAPI.getVersion().then((v) => {
       setVersion(v)
     })
 
-    // Get initial auth state
     window.electronAPI.getAuthState().then((state) => {
       setAuthState(state)
     })
 
-    // Subscribe to auth state changes
     const cleanupAuth = window.electronAPI.onAuthStateChanged((state) => {
       setAuthState(state)
       setIsLoggingIn(false)
     })
 
-    // Get initial usage data
     window.electronAPI.getUsageData().then((state) => {
-      setUsageState({
-        data: state.data,
-        lastUpdated: state.lastUpdated,
-        error: state.error,
-        isLoading: false
-      })
+      setUsageState(state)
     })
 
-    // Subscribe to usage data changes
     const cleanupUsage = window.electronAPI.onUsageDataChanged((data) => {
-      setUsageState((prev) => ({
-        ...prev,
-        data,
-        lastUpdated: new Date(),
-        error: null,
-        isLoading: false
-      }))
+      setUsageState(data)
     })
 
     return () => {
@@ -94,20 +107,23 @@ function App() {
   }
 
   const handleRefresh = async () => {
-    setUsageState((prev) => ({ ...prev, isLoading: true }))
+    setUsageState((prev) => ({
+      providers: {
+        claude: { ...prev.providers.claude, isLoading: true },
+        codex: { ...prev.providers.codex, isLoading: true }
+      }
+    }))
+
     try {
       const result = await window.electronAPI.refreshUsageData()
-      setUsageState({
-        data: result.data,
-        lastUpdated: result.lastUpdated,
-        error: result.error,
-        isLoading: false
-      })
+      setUsageState(result)
     } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to refresh'
       setUsageState((prev) => ({
-        ...prev,
-        error: error instanceof Error ? error.message : 'Failed to refresh',
-        isLoading: false
+        providers: {
+          claude: { ...prev.providers.claude, error: message, isLoading: false },
+          codex: { ...prev.providers.codex, error: message, isLoading: false }
+        }
       }))
     }
   }
@@ -115,16 +131,16 @@ function App() {
   return (
     <div className="app-container">
       <header className="app-header">
-        <h1 className="app-title">Claude Usage</h1>
+        <h1 className="app-title">AI Usage</h1>
         <div className="header-right">
-          {authState.isAuthenticated && <span className="user-badge">Logged in</span>}
+          {authState.isAuthenticated && <span className="user-badge">Claude connected</span>}
           {authState.isAuthenticated && (
             <button
               className="settings-button"
               onClick={() => setShowSettings(!showSettings)}
               title="Settings"
             >
-              ⚙
+              [=]
             </button>
           )}
           <span className="app-version">v{version}</span>
@@ -134,34 +150,32 @@ function App() {
       <main className="app-content">
         {isLoggingIn ? (
           <div className="waiting-message">
-            <p>Waiting for login...</p>
-          </div>
-        ) : !authState.isAuthenticated ? (
-          <div className="login-prompt">
-            <p className="login-message">Log in to see usage</p>
-            <button
-              className="login-button"
-              onClick={handleLogin}
-              disabled={isLoggingIn}
-            >
-              Log in with Claude.ai
-            </button>
+            <p>Waiting for Claude login...</p>
           </div>
         ) : showSettings ? (
           <Settings onClose={() => setShowSettings(false)} />
         ) : (
-          <UsageDisplay
-            data={usageState.data}
-            lastUpdated={usageState.lastUpdated}
-            error={usageState.error}
-            isLoading={usageState.isLoading}
-            onRefresh={handleRefresh}
-          />
+          <div className="dashboard-shell">
+            {!authState.isAuthenticated && (
+              <div className="login-prompt">
+                <p className="login-message">Claude is not connected yet.</p>
+                <button
+                  className="login-button"
+                  onClick={handleLogin}
+                  disabled={isLoggingIn}
+                >
+                  Log in with Claude.ai
+                </button>
+              </div>
+            )}
+
+            <UsageDisplay dashboard={usageState} onRefresh={handleRefresh} />
+          </div>
         )}
       </main>
 
       <footer className="app-footer">
-        {authState.isAuthenticated && <p>Logged in</p>}
+        <p>{authState.isAuthenticated ? 'Claude connected' : 'Claude not connected'}</p>
       </footer>
     </div>
   )

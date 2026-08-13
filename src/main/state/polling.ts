@@ -20,11 +20,7 @@ async function fetchWithRetry(): Promise<void> {
         const errorMsg = error.message
 
         // Don't retry auth errors - stop immediately
-        if (
-          errorMsg.includes('Not authenticated') ||
-          errorMsg.includes('401') ||
-          errorMsg.includes('403')
-        ) {
+        if (errorMsg.includes('401') || errorMsg.includes('403')) {
           console.log('[Polling] Auth error detected, stopping retries')
           return false
         }

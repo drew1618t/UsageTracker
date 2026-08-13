@@ -6,6 +6,7 @@ const ElectronStore = ElectronStoreModule.default || ElectronStoreModule
 interface SettingsSchema {
   pollingIntervalMinutes: number
   autoStartEnabled: boolean
+  acknowledgedLimits: Record<string, string>
 }
 
 const schema = {
@@ -18,21 +19,75 @@ const schema = {
   autoStartEnabled: {
     type: 'boolean',
     default: false
+  },
+  acknowledgedLimits: {
+    type: 'object',
+    default: {},
+    additionalProperties: {
+      type: 'string'
+    }
   }
 } as const
 
 const store = new ElectronStore<SettingsSchema>({
+  projectName: 'usage',
   schema,
   defaults: {
     pollingIntervalMinutes: 5,
-    autoStartEnabled: false
+    autoStartEnabled: false,
+    acknowledgedLimits: {}
   }
 })
 
 export function getSettings(): SettingsSchema {
   return {
     pollingIntervalMinutes: store.get('pollingIntervalMinutes'),
-    autoStartEnabled: store.get('autoStartEnabled')
+    autoStartEnabled: store.get('autoStartEnabled'),
+    acknowledgedLimits: store.get('acknowledgedLimits')
+  }
+}
+
+function getAcknowledgementId(providerId: string, limitKey: string): string {
+  return `${providerId}:${limitKey}`
+}
+
+export function getAcknowledgedLimits(): Record<string, string> {
+  clearExpiredAcknowledgements()
+  return { ...store.get('acknowledgedLimits') }
+}
+
+export function isLimitAcknowledged(
+  providerId: string,
+  limitKey: string,
+  resetAt: string
+): boolean {
+  return getAcknowledgedLimits()[getAcknowledgementId(providerId, limitKey)] === resetAt
+}
+
+export function acknowledgeLimitUntilReset(
+  providerId: string,
+  limitKey: string,
+  resetAt: string
+): void {
+  const acknowledgements = getAcknowledgedLimits()
+  acknowledgements[getAcknowledgementId(providerId, limitKey)] = resetAt
+  store.set('acknowledgedLimits', acknowledgements)
+}
+
+export function clearExpiredAcknowledgements(): void {
+  const acknowledgements = { ...store.get('acknowledgedLimits') }
+  let changed = false
+
+  for (const [key, resetAt] of Object.entries(acknowledgements)) {
+    const resetAtMs = new Date(resetAt).getTime()
+    if (!Number.isFinite(resetAtMs) || resetAtMs <= Date.now()) {
+      delete acknowledgements[key]
+      changed = true
+    }
+  }
+
+  if (changed) {
+    store.set('acknowledgedLimits', acknowledgements)
   }
 }
 

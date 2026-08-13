@@ -6,27 +6,45 @@ export interface AuthState {
 export interface SettingsSchema {
   pollingIntervalMinutes: number
   autoStartEnabled: boolean
+  acknowledgedLimits?: Record<string, string>
 }
 
-export interface UsageLimit {
+export type ProviderId = 'claude' | 'codex'
+
+export interface ProviderLimit {
+  key: string
+  label: string
   current: number
   total: number
   percentage: number
   resetAt: string
+  isAcknowledged?: boolean
 }
 
-export interface UsageData {
-  sessionLimit: UsageLimit
-  weeklyAllModels: UsageLimit
-  weeklySonnet: UsageLimit
+export interface ProviderUsageData {
+  providerId: ProviderId
+  providerLabel: string
   fetchedAt: string
+  limits: ProviderLimit[]
+  primaryLimitKey: string | null
+  source: 'remote' | 'local'
+  metadata?: {
+    planType?: string
+    totalTokens?: number
+    lastTokens?: number
+  }
 }
 
-export interface UsageState {
-  data: UsageData | null
-  lastUpdated: Date | null
+export interface ProviderUsageState {
+  data: ProviderUsageData | null
+  lastUpdated: string | null
   error: string | null
   isLoading: boolean
+  statusLabel: string
+}
+
+export interface UsageDashboardState {
+  providers: Record<ProviderId, ProviderUsageState>
 }
 
 export interface ElectronAPI {
@@ -40,9 +58,14 @@ export interface ElectronAPI {
   logout: () => Promise<void>
   onAuthStateChanged: (callback: (state: AuthState) => void) => () => void
   // Usage data methods
-  getUsageData: () => Promise<UsageState>
-  refreshUsageData: () => Promise<UsageState>
-  onUsageDataChanged: (callback: (data: UsageData) => void) => () => void
+  getUsageData: () => Promise<UsageDashboardState>
+  refreshUsageData: () => Promise<UsageDashboardState>
+  acknowledgeUsageLimit: (
+    providerId: ProviderId,
+    limitKey: string,
+    resetAt: string
+  ) => Promise<UsageDashboardState>
+  onUsageDataChanged: (callback: (data: UsageDashboardState) => void) => () => void
   // Settings methods
   getSettings: () => Promise<SettingsSchema>
   setPollingInterval: (minutes: number) => Promise<void>

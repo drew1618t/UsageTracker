@@ -3,8 +3,8 @@ import path from 'path'
 import { togglePopupWindow } from './window'
 import { getAuthState } from './auth/state'
 import { openLoginPage, logout, setAuthState } from './auth'
-import type { UsageData } from './api/types'
-import { selectPrimaryLimit, determineTrayIconColor } from './utils/displayLogic'
+import type { ProviderLimit, UsageDashboardState } from './api/types'
+import { determineTrayIconColor, selectHighestUsageLimit } from './utils/displayLogic'
 
 export let tray: Tray | null = null
 
@@ -29,8 +29,8 @@ export function createTray(): Tray {
 
   // Set tooltip based on auth state
   const tooltip = authState.isAuthenticated
-    ? 'Claude Usage Widget'
-    : 'Claude Usage - Not logged in'
+    ? 'AI Usage'
+    : 'AI Usage - Claude not logged in'
   tray.setToolTip(tooltip)
 
   // Build context menu
@@ -143,8 +143,8 @@ export function updateTrayForAuthState(isAuthenticated: boolean): void {
 
   // Update tooltip
   const tooltip = isAuthenticated
-    ? 'Claude Usage Widget'
-    : 'Claude Usage - Not logged in'
+    ? 'AI Usage'
+    : 'AI Usage - Claude not logged in'
   tray.setToolTip(tooltip)
 }
 
@@ -164,21 +164,15 @@ export function updateTrayIcon(status: 'green' | 'yellow' | 'red'): void {
 /**
  * Update tray icon and tooltip based on usage data
  */
-export function updateTrayForUsage(data: UsageData): void {
+export function updateTrayForUsage(state: UsageDashboardState): void {
   if (!tray || tray.isDestroyed()) return
 
-  // Use display logic to determine primary limit for tooltip
-  const { limit: primaryLimit, type: primaryType } = selectPrimaryLimit(
-    data.sessionLimit,
-    data.weeklyAllModels
-  )
+  const availableProviders = Object.values(state.providers)
+    .map((providerState) => providerState.data)
+    .filter((provider): provider is NonNullable<typeof provider> => Boolean(provider))
 
-  // Determine icon color based on ANY limit hitting threshold
-  const iconColor = determineTrayIconColor(
-    data.sessionLimit,
-    data.weeklyAllModels,
-    data.weeklySonnet
-  )
+  const allLimits = availableProviders.flatMap((provider) => provider.limits)
+  const iconColor = determineTrayIconColor(...allLimits)
 
   // Update icon
   const isDev = !app.isPackaged
@@ -189,8 +183,20 @@ export function updateTrayForUsage(data: UsageData): void {
   const icon = nativeImage.createFromPath(iconPath)
   tray.setImage(icon)
 
-  // Update tooltip with primary limit
-  const limitName = primaryType === 'session' ? 'Session' : 'Weekly'
-  const tooltip = `Claude: ${limitName} ${Math.round(primaryLimit.percentage)}%`
+  const highest = selectHighestUsageLimit(availableProviders)
+
+  let tooltip = 'AI Usage - No usage data'
+  if (highest) {
+    tooltip = `AI Usage: ${highest.provider.providerLabel} ${formatTrayLimitLabel(highest.limit)} ${Math.round(highest.limit.percentage)}%`
+  } else if (!getAuthState().isAuthenticated) {
+    tooltip = 'AI Usage - Claude not logged in'
+  }
+
   tray.setToolTip(tooltip)
+}
+
+function formatTrayLimitLabel(limit: ProviderLimit): string {
+  return limit.label
+    .replace(' Limit', '')
+    .replace(' (All Models)', '')
 }

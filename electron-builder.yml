@@ -1,5 +1,5 @@
 appId: com.claudeusage.traywidget
-productName: Claude Usage Widget
+productName: AI Usage
 directories:
   output: dist
   buildResources: resources

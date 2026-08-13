@@ -1,4 +1,4 @@
-import { UsageLimit } from '../api/types'
+import { ProviderLimit, ProviderUsageData } from '../api/types'
 
 /**
  * Selects the primary limit to display, defaulting to session but switching to weekly
@@ -9,9 +9,9 @@ import { UsageLimit } from '../api/types'
  * @returns Object with the selected limit and its type
  */
 export function selectPrimaryLimit(
-  sessionLimit: UsageLimit,
-  weeklyLimit: UsageLimit
-): { limit: UsageLimit; type: 'session' | 'weekly' } {
+  sessionLimit: ProviderLimit,
+  weeklyLimit: ProviderLimit
+): { limit: ProviderLimit; type: 'session' | 'weekly' } {
   // Default to session
   if (weeklyLimit.percentage <= 90) {
     return { limit: sessionLimit, type: 'session' }
@@ -47,19 +47,45 @@ export function selectPrimaryLimit(
  * @returns Color code for tray icon
  */
 export function determineTrayIconColor(
-  sessionLimit: UsageLimit,
-  weeklyAllModels: UsageLimit,
-  weeklySonnet: UsageLimit
+  ...limits: ProviderLimit[]
 ): 'green' | 'yellow' | 'red' {
-  const limits = [
-    sessionLimit.percentage,
-    weeklyAllModels.percentage,
-    weeklySonnet.percentage
-  ]
+  const activeLimits = limits.filter((limit) => !limit.isAcknowledged)
+  if (activeLimits.length === 0) {
+    return 'green'
+  }
 
-  const maxPercentage = Math.max(...limits)
+  const maxPercentage = Math.max(...activeLimits.map((limit) => limit.percentage))
 
   if (maxPercentage >= 90) return 'red'
   if (maxPercentage >= 70) return 'yellow'
   return 'green'
+}
+
+export function selectPrimaryClaudeLimit(limits: ProviderLimit[]): ProviderLimit | null {
+  const sessionLimit = limits.find((limit) => limit.key === 'sessionLimit')
+  const weeklyAllModels = limits.find((limit) => limit.key === 'weeklyAllModels')
+
+  if (!sessionLimit) {
+    return weeklyAllModels ?? limits[0] ?? null
+  }
+
+  if (!weeklyAllModels) {
+    return sessionLimit
+  }
+
+  return selectPrimaryLimit(sessionLimit, weeklyAllModels).limit
+}
+
+export function selectHighestUsageLimit(
+  providers: ProviderUsageData[]
+): { provider: ProviderUsageData; limit: ProviderLimit } | null {
+  const providerLimits = providers
+    .flatMap((provider) =>
+      provider.limits
+        .filter((limit) => !limit.isAcknowledged)
+        .map((limit) => ({ provider, limit }))
+    )
+    .sort((a, b) => b.limit.percentage - a.limit.percentage)
+
+  return providerLimits[0] ?? null
 }

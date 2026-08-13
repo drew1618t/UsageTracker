@@ -10,9 +10,11 @@ import {
   getAuthState,
   persistSessionCookies
 } from './auth'
-import { getUsageData, refreshUsageData } from './state/usage'
+import { acknowledgeUsageLimit, getUsageDashboardData, refreshUsageData } from './state/usage'
 import { initSettings, getSettings, setPollingInterval, setAutoStart } from './state/settings'
 import { startPolling, stopPolling } from './state/polling'
+
+app.disableHardwareAcceleration()
 
 // Check if launched at startup (hidden mode)
 const isHiddenLaunch = process.argv.includes('--hidden')
@@ -99,11 +101,17 @@ if (!gotTheLock) {
       })
 
       // Register usage IPC handlers
-      ipcMain.handle('usage:get', () => getUsageData())
-      ipcMain.handle('usage:refresh', async () => {
+      ipcMain.handle('usage:get-all', () => getUsageDashboardData())
+      ipcMain.handle('usage:refresh-all', async () => {
         await refreshUsageData()
-        return getUsageData()
+        return getUsageDashboardData()
       })
+      ipcMain.handle(
+        'usage:acknowledge-limit',
+        async (_event, providerId: 'claude' | 'codex', limitKey: string, resetAt: string) => {
+          return acknowledgeUsageLimit(providerId, limitKey, resetAt)
+        }
+      )
 
       // Settings IPC handlers
       ipcMain.handle('settings:get', () => getSettings())

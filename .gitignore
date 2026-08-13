@@ -3,3 +3,5 @@ out
 dist
 .env
 *.log
+.claude/
+tmp-installed-asar*/

@@ -29,6 +29,8 @@ export function createPopupWindow(trayBounds: Electron.Rectangle): BrowserWindow
   x = Math.max(0, Math.min(x, screenWidth - width))
   y = Math.max(0, Math.min(y, screenHeight - height))
 
+  const preloadPath = path.join(__dirname, '../preload/index.js')
+
   // Create popup window
   popupWindow = new BrowserWindow({
     width,
@@ -43,7 +45,7 @@ export function createPopupWindow(trayBounds: Electron.Rectangle): BrowserWindow
     webPreferences: {
       contextIsolation: true,
       nodeIntegration: false,
-      preload: path.join(__dirname, '../preload/index.js')
+      preload: preloadPath
     }
   })
 
@@ -58,6 +60,22 @@ export function createPopupWindow(trayBounds: Electron.Rectangle): BrowserWindow
     popupWindow = null
   })
 
+  popupWindow.webContents.on('did-fail-load', (_event, errorCode, errorDescription, validatedURL) => {
+    console.error('[Window] Failed to load renderer:', {
+      errorCode,
+      errorDescription,
+      validatedURL
+    })
+  })
+
+  popupWindow.webContents.on('render-process-gone', (_event, details) => {
+    console.error('[Window] Renderer process gone:', details)
+  })
+
+  popupWindow.webContents.on('preload-error', (_event, preloadPathValue, error) => {
+    console.error('[Window] Preload error:', preloadPathValue, error)
+  })
+
   // Show after render (prevents white flash)
   popupWindow.once('ready-to-show', () => {
     popupWindow?.show()
@@ -68,7 +86,9 @@ export function createPopupWindow(trayBounds: Electron.Rectangle): BrowserWindow
   if (isDev) {
     popupWindow.loadURL(process.env.ELECTRON_RENDERER_URL || 'http://localhost:5173')
   } else {
-    popupWindow.loadFile(path.join(__dirname, '../renderer/index.html'))
+    const rendererPath = path.join(__dirname, '../renderer/index.html')
+    console.log('[Window] Loading renderer from:', rendererPath)
+    popupWindow.loadFile(rendererPath)
   }
 
   return popupWindow

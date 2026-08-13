@@ -1,20 +1,37 @@
-export interface UsageLimit {
-  current: number // Current usage value
-  total: number // Maximum allowed
-  percentage: number // Calculated percentage (0-100)
-  resetAt: string // ISO timestamp when limit resets
+export type ProviderId = 'claude' | 'codex'
+
+export interface ProviderLimit {
+  key: string
+  label: string
+  current: number
+  total: number
+  percentage: number
+  resetAt: string
+  isAcknowledged?: boolean
 }
 
-export interface UsageData {
-  sessionLimit: UsageLimit
-  weeklyAllModels: UsageLimit
-  weeklySonnet: UsageLimit
-  fetchedAt: string // ISO timestamp when data was fetched
+export interface ProviderUsageData {
+  providerId: ProviderId
+  providerLabel: string
+  fetchedAt: string
+  limits: ProviderLimit[]
+  primaryLimitKey: string | null
+  source: 'remote' | 'local'
+  metadata?: {
+    planType?: string
+    totalTokens?: number
+    lastTokens?: number
+  }
 }
 
-export interface UsageState {
-  data: UsageData | null
-  lastUpdated: Date | null
+export interface ProviderUsageState {
+  data: ProviderUsageData | null
+  lastUpdated: string | null
   error: string | null
   isLoading: boolean
+  statusLabel: string
+}
+
+export interface UsageDashboardState {
+  providers: Record<ProviderId, ProviderUsageState>
 }

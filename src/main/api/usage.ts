@@ -1,5 +1,6 @@
-import { net, session, ClientRequest } from 'electron'
-import type { UsageData, UsageLimit } from './types'
+import { net, session } from 'electron'
+import { selectPrimaryClaudeLimit } from '../utils/displayLogic'
+import type { ProviderUsageData, ProviderLimit } from './types'
 
 /**
  * Make an authenticated request using net.request (better cookie handling)
@@ -68,7 +69,7 @@ function makeAuthenticatedRequest(
  * @returns Promise<UsageData> - Usage data with all three limit types
  * @throws Error if not authenticated (401), network error, or invalid response
  */
-export async function fetchUsageData(): Promise<UsageData> {
+export async function fetchClaudeUsageData(): Promise<ProviderUsageData> {
   try {
     // Use the same session partition as auth module
     const ses = session.fromPartition('persist:main')
@@ -175,15 +176,18 @@ async function getOrganizationId(ses: Electron.Session): Promise<string | null> 
  *   "seven_day_sonnet": { "utilization": 41.0, "resets_at": "ISO-timestamp" } | null
  * }
  */
-function transformUsageResponse(rawData: any): UsageData {
+function transformUsageResponse(rawData: any): ProviderUsageData {
   // Helper to create UsageLimit from API data
   // Note: API provides utilization as percentage (0-100), not current/total
   const createLimit = (
+    key: string,
+    label: string,
     data: { utilization: number; resets_at: string } | null
-  ): UsageLimit => {
+  ): ProviderLimit => {
     if (!data) {
-      // Return zero limit if not available
       return {
+        key,
+        label,
         current: 0,
         total: 100,
         percentage: 0,
@@ -195,7 +199,8 @@ function transformUsageResponse(rawData: any): UsageData {
     const percentage = Math.round(data.utilization)
 
     return {
-      // Estimate current/total from percentage (API doesn't provide absolute values)
+      key,
+      label,
       current: percentage,
       total: 100,
       percentage,
@@ -203,11 +208,26 @@ function transformUsageResponse(rawData: any): UsageData {
     }
   }
 
-  // Map API fields to our structure
+  const sessionLimit = createLimit('sessionLimit', 'Session Limit', rawData.five_hour)
+  const weeklyAllModels = createLimit(
+    'weeklyAllModels',
+    'Weekly (All Models)',
+    rawData.seven_day
+  )
+  const weeklySonnet = createLimit(
+    'weeklySonnet',
+    'Weekly (Sonnet)',
+    rawData.seven_day_sonnet
+  )
+  const limits = [sessionLimit, weeklyAllModels, weeklySonnet]
+  const primaryLimitKey = selectPrimaryClaudeLimit(limits)?.key ?? null
+
   return {
-    sessionLimit: createLimit(rawData.five_hour),
-    weeklyAllModels: createLimit(rawData.seven_day),
-    weeklySonnet: createLimit(rawData.seven_day_sonnet),
-    fetchedAt: new Date().toISOString()
+    providerId: 'claude',
+    providerLabel: 'Claude',
+    fetchedAt: new Date().toISOString(),
+    limits,
+    primaryLimitKey,
+    source: 'remote'
   }
 }

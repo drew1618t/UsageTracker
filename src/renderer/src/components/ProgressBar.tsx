@@ -9,6 +9,9 @@ interface ProgressBarProps {
   total: number
   resetAt: Date
   isLimiting?: boolean  // True for most-limiting constraint
+  isAcknowledged?: boolean
+  canAcknowledge?: boolean
+  onAcknowledge?: () => Promise<void> | void
 }
 
 export function ProgressBar({
@@ -17,7 +20,10 @@ export function ProgressBar({
   current,
   total,
   resetAt,
-  isLimiting = false
+  isLimiting = false,
+  isAcknowledged = false,
+  canAcknowledge = false,
+  onAcknowledge
 }: ProgressBarProps) {
   // Calculate gradient based on percentage thresholds
   // Green < 70%, Yellow 70-90%, Red >= 90%
@@ -38,14 +44,17 @@ export function ProgressBar({
   }
 
   // Format reset time
-  const absoluteTime = format(resetAt, 'h:mm a')  // "3:00 PM"
+  const isWeeklyLimit = label.toLowerCase().includes('weekly')
+  const absoluteTime = format(resetAt, isWeeklyLimit ? 'EEE h:mm a' : 'h:mm a')
   const relativeTime = formatDistanceToNow(resetAt, { addSuffix: true })  // "in 2 hours"
 
   // Tooltip text for absolute values
   const tooltipText = `${current} / ${total}`
 
   return (
-    <div className={`progress-bar-container ${isLimiting ? 'limiting' : ''}`}>
+    <div
+      className={`progress-bar-container ${isLimiting ? 'limiting' : ''} ${isAcknowledged ? 'acknowledged' : ''}`}
+    >
       <div className="progress-header">
         <span className="progress-label">{label}</span>
         <span className="progress-percentage">{percentage}%</span>
@@ -65,6 +74,12 @@ export function ProgressBar({
         <span className="reset-time" title={relativeTime}>
           Resets at {absoluteTime}
         </span>
+        {isAcknowledged && <span className="acknowledged-label">Acknowledged</span>}
+        {canAcknowledge && onAcknowledge && (
+          <button className="acknowledge-button" onClick={() => onAcknowledge()}>
+            Ignore until reset
+          </button>
+        )}
       </div>
     </div>
   )
