@@ -1,50 +1,8 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import './App.css'
 import { UsageDisplay } from './components/UsageDisplay'
 import { Settings } from './components/Settings'
-
-interface AuthState {
-  isAuthenticated: boolean
-  userIdentifier: string | null
-}
-
-type ProviderId = 'claude' | 'codex'
-
-interface ProviderLimit {
-  key: string
-  label: string
-  current: number
-  total: number
-  percentage: number
-  resetAt: string
-  isAcknowledged?: boolean
-}
-
-interface ProviderUsageData {
-  providerId: ProviderId
-  providerLabel: string
-  fetchedAt: string
-  limits: ProviderLimit[]
-  primaryLimitKey: string | null
-  source: 'remote' | 'local'
-  metadata?: {
-    planType?: string
-    totalTokens?: number
-    lastTokens?: number
-  }
-}
-
-interface ProviderUsageState {
-  data: ProviderUsageData | null
-  lastUpdated: string | null
-  error: string | null
-  isLoading: boolean
-  statusLabel: string
-}
-
-interface UsageDashboardState {
-  providers: Record<ProviderId, ProviderUsageState>
-}
+import type { AuthState, UsageDashboardState } from '../../shared/types'
 
 function App() {
   const [version, setVersion] = useState<string>('...')

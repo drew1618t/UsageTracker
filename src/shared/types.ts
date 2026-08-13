@@ -1,4 +1,18 @@
+// Shared types used by the main process, preload bridge, and renderer.
+// This is the single source of truth - do not redefine these shapes elsewhere.
+
 export type ProviderId = 'claude' | 'codex'
+
+export interface AuthState {
+  isAuthenticated: boolean
+  userIdentifier: string | null
+}
+
+export interface SettingsSchema {
+  pollingIntervalMinutes: number
+  autoStartEnabled: boolean
+  acknowledgedLimits?: Record<string, string>
+}
 
 export interface ProviderLimit {
   key: string

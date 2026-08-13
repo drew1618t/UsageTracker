@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain } from 'electron'
+import { app, ipcMain } from 'electron'
 import { createTray, tray } from './tray'
 import { getPopupWindow, togglePopupWindow } from './window'
 import {
@@ -44,11 +44,9 @@ if (!gotTheLock) {
     }
   })
 
-  // Prevent app from quitting when all windows are closed
-  // This keeps the tray icon alive
-  app.on('window-all-closed', (e) => {
-    e.preventDefault()
-  })
+  // Keep the app (and tray icon) alive when all windows are closed.
+  // Not calling app.quit() here is what prevents the default exit.
+  app.on('window-all-closed', () => {})
 
   // Prevent app from quitting on macOS
   app.on('activate', () => {
@@ -84,10 +82,6 @@ if (!gotTheLock) {
 
       // Register IPC handlers
       ipcMain.handle('app:get-version', () => app.getVersion())
-      ipcMain.handle('app:refresh-data', async () => {
-        // Placeholder for future implementation
-        return null
-      })
 
       // Register auth IPC handlers
       ipcMain.handle('auth:get-state', () => getAuthState())

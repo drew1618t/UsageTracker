@@ -1,78 +1,16 @@
 import { contextBridge, ipcRenderer } from 'electron'
-
-// Auth state interface
-export interface AuthState {
-  isAuthenticated: boolean
-  userIdentifier: string | null
-}
-
-// Settings interface
-export interface SettingsSchema {
-  pollingIntervalMinutes: number
-  autoStartEnabled: boolean
-  acknowledgedLimits?: Record<string, string>
-}
-
-export type ProviderId = 'claude' | 'codex'
-
-export interface ProviderLimit {
-  key: string
-  label: string
-  current: number
-  total: number
-  percentage: number
-  resetAt: string
-  isAcknowledged?: boolean
-}
-
-export interface ProviderUsageData {
-  providerId: ProviderId
-  providerLabel: string
-  fetchedAt: string
-  limits: ProviderLimit[]
-  primaryLimitKey: string | null
-  source: 'remote' | 'local'
-  metadata?: {
-    planType?: string
-    totalTokens?: number
-    lastTokens?: number
-  }
-}
-
-export interface ProviderUsageState {
-  data: ProviderUsageData | null
-  lastUpdated: string | null
-  error: string | null
-  isLoading: boolean
-  statusLabel: string
-}
-
-export interface UsageDashboardState {
-  providers: Record<ProviderId, ProviderUsageState>
-}
+import type {
+  AuthState,
+  ProviderId,
+  SettingsSchema,
+  UsageDashboardState
+} from '../shared/types'
 
 // Expose secure IPC bridge to renderer
 contextBridge.exposeInMainWorld('electronAPI', {
   // Get app version
   getVersion: (): Promise<string> => {
     return ipcRenderer.invoke('app:get-version')
-  },
-
-  // Refresh usage data
-  refreshData: (): Promise<void> => {
-    return ipcRenderer.invoke('app:refresh-data')
-  },
-
-  // Listen for tray actions
-  onTrayAction: (callback: (action: string) => void): void => {
-    ipcRenderer.on('tray:action', (_event, action) => {
-      callback(action)
-    })
-  },
-
-  // Remove all listeners for a channel
-  removeAllListeners: (channel: string): void => {
-    ipcRenderer.removeAllListeners(channel)
   },
 
   // Auth methods

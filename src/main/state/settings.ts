@@ -1,13 +1,8 @@
 import { app, BrowserWindow } from 'electron'
+import type { SettingsSchema } from '../../shared/types'
 // Using require for electron-store due to ESM/CJS compatibility
 const ElectronStoreModule = require('electron-store')
 const ElectronStore = ElectronStoreModule.default || ElectronStoreModule
-
-interface SettingsSchema {
-  pollingIntervalMinutes: number
-  autoStartEnabled: boolean
-  acknowledgedLimits: Record<string, string>
-}
 
 const schema = {
   pollingIntervalMinutes: {
@@ -29,7 +24,8 @@ const schema = {
   }
 } as const
 
-const store = new ElectronStore<SettingsSchema>({
+// electron-store is loaded via require (untyped), so no type argument here
+const store = new ElectronStore({
   projectName: 'usage',
   schema,
   defaults: {
@@ -75,7 +71,7 @@ export function acknowledgeLimitUntilReset(
 }
 
 export function clearExpiredAcknowledgements(): void {
-  const acknowledgements = { ...store.get('acknowledgedLimits') }
+  const acknowledgements: Record<string, string> = { ...store.get('acknowledgedLimits') }
   let changed = false
 
   for (const [key, resetAt] of Object.entries(acknowledgements)) {

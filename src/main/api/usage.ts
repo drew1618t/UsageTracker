@@ -1,6 +1,6 @@
 import { net, session } from 'electron'
 import { selectPrimaryClaudeLimit } from '../utils/displayLogic'
-import type { ProviderUsageData, ProviderLimit } from './types'
+import type { ProviderUsageData, ProviderLimit } from '../../shared/types'
 
 /**
  * Make an authenticated request using net.request (better cookie handling)
@@ -138,12 +138,12 @@ async function getOrganizationId(ses: Electron.Session): Promise<string | null> 
       return orgCookie.value
     }
 
-    // Fallback: try to get from organizations endpoint
+    // Fallback: try to get from organizations endpoint.
+    // Use ses.fetch (not net.fetch) so the request carries this session's cookies.
     console.log('[Usage API] lastActiveOrg cookie not found, trying /api/organizations')
-    const response = await net.fetch('https://claude.ai/api/organizations', {
+    const response = await ses.fetch('https://claude.ai/api/organizations', {
       credentials: 'include',
-      headers: { Accept: 'application/json' },
-      session: ses
+      headers: { Accept: 'application/json' }
     })
 
     console.log('[Usage API] /api/organizations status:', response.status)
@@ -168,12 +168,13 @@ async function getOrganizationId(ses: Electron.Session): Promise<string | null> 
 
 /**
  * Transforms the Claude.ai API response into our UsageData structure.
+ * Tracks the session (5h) and weekly all-models windows; limits the API
+ * omits or returns as null are skipped rather than shown as fake 0% bars.
  *
  * API response format:
  * {
  *   "five_hour": { "utilization": 29.0, "resets_at": "ISO-timestamp" },
- *   "seven_day": { "utilization": 79.0, "resets_at": "ISO-timestamp" },
- *   "seven_day_sonnet": { "utilization": 41.0, "resets_at": "ISO-timestamp" } | null
+ *   "seven_day": { "utilization": 79.0, "resets_at": "ISO-timestamp" }
  * }
  */
 function transformUsageResponse(rawData: any): ProviderUsageData {
@@ -182,17 +183,10 @@ function transformUsageResponse(rawData: any): ProviderUsageData {
   const createLimit = (
     key: string,
     label: string,
-    data: { utilization: number; resets_at: string } | null
-  ): ProviderLimit => {
+    data: { utilization: number; resets_at: string } | null | undefined
+  ): ProviderLimit | null => {
     if (!data) {
-      return {
-        key,
-        label,
-        current: 0,
-        total: 100,
-        percentage: 0,
-        resetAt: new Date().toISOString()
-      }
+      return null
     }
 
     // API gives utilization as percentage directly
@@ -208,18 +202,10 @@ function transformUsageResponse(rawData: any): ProviderUsageData {
     }
   }
 
-  const sessionLimit = createLimit('sessionLimit', 'Session Limit', rawData.five_hour)
-  const weeklyAllModels = createLimit(
-    'weeklyAllModels',
-    'Weekly (All Models)',
-    rawData.seven_day
-  )
-  const weeklySonnet = createLimit(
-    'weeklySonnet',
-    'Weekly (Sonnet)',
-    rawData.seven_day_sonnet
-  )
-  const limits = [sessionLimit, weeklyAllModels, weeklySonnet]
+  const limits = [
+    createLimit('sessionLimit', 'Session Limit', rawData.five_hour),
+    createLimit('weeklyAllModels', 'Weekly (All Models)', rawData.seven_day)
+  ].filter((limit): limit is ProviderLimit => limit !== null)
   const primaryLimitKey = selectPrimaryClaudeLimit(limits)?.key ?? null
 
   return {

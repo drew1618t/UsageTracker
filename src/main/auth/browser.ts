@@ -1,4 +1,4 @@
-import { BrowserWindow, session } from 'electron'
+import { BrowserWindow } from 'electron'
 
 const LOGIN_URL = 'https://claude.ai/login'
 

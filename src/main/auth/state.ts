@@ -1,9 +1,7 @@
 import { BrowserWindow } from 'electron'
+import type { AuthState } from '../../shared/types'
 
-export interface AuthState {
-  isAuthenticated: boolean
-  userIdentifier: string | null
-}
+export type { AuthState }
 
 let authState: AuthState = {
   isAuthenticated: false,
@@ -31,8 +29,8 @@ export function setAuthState(state: AuthState): void {
   })
 
   // Update tray icon for auth state (dynamic import to avoid circular dependency)
-  import('../tray').then(({ updateTrayForAuthState, rebuildContextMenu }) => {
-    updateTrayForAuthState(state.isAuthenticated)
+  import('../tray').then(async ({ updateTrayForAuthState, rebuildContextMenu }) => {
+    await updateTrayForAuthState(state.isAuthenticated)
     rebuildContextMenu()
   }).catch(err => {
     console.error('Failed to update tray for auth state:', err)

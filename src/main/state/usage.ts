@@ -7,7 +7,7 @@ import type {
   ProviderUsageData,
   ProviderUsageState,
   UsageDashboardState
-} from '../api/types'
+} from '../../shared/types'
 import { selectPrimaryClaudeLimit } from '../utils/displayLogic'
 import { acknowledgeLimitUntilReset, isLimitAcknowledged } from './settings'
 

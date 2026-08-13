@@ -1,4 +1,4 @@
-import { ProviderLimit, ProviderUsageData } from '../api/types'
+import { ProviderLimit, ProviderUsageData } from '../../shared/types'
 
 /**
  * Selects the primary limit to display, defaulting to session but switching to weekly
@@ -38,13 +38,8 @@ export function selectPrimaryLimit(
 }
 
 /**
- * Determines tray icon color based on the most limiting threshold across all limits.
- * Evaluates session, weekly all-models, and weekly Sonnet independently.
- *
- * @param sessionLimit - Current session usage limit
- * @param weeklyAllModels - Current weekly all-models usage limit
- * @param weeklySonnet - Current weekly Sonnet usage limit
- * @returns Color code for tray icon
+ * Determines tray icon color from the highest unacknowledged limit across
+ * all providers. Green under 70%, yellow 70-89%, red at 90%+.
  */
 export function determineTrayIconColor(
   ...limits: ProviderLimit[]

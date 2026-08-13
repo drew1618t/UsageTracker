@@ -1,36 +1,8 @@
-import { backOff } from 'exponential-backoff'
 import { refreshUsageData } from './usage'
 import { getSettings } from './settings'
 
 let pollingTimer: NodeJS.Timeout | null = null
 let isPolling = false
-
-async function fetchWithRetry(): Promise<void> {
-  await backOff(
-    async () => {
-      await refreshUsageData()
-    },
-    {
-      numOfAttempts: 5,
-      startingDelay: 1000,
-      timeMultiple: 2,
-      maxDelay: 60000,
-      jitter: 'full',
-      retry: (error: Error, attemptNumber: number) => {
-        const errorMsg = error.message
-
-        // Don't retry auth errors - stop immediately
-        if (errorMsg.includes('401') || errorMsg.includes('403')) {
-          console.log('[Polling] Auth error detected, stopping retries')
-          return false
-        }
-
-        console.log(`[Polling] Retry attempt ${attemptNumber}: ${errorMsg}`)
-        return true
-      }
-    }
-  )
-}
 
 async function poll(): Promise<void> {
   if (!isPolling) {
@@ -38,7 +10,9 @@ async function poll(): Promise<void> {
   }
 
   try {
-    await fetchWithRetry()
+    // refreshUsageData handles per-provider errors internally; a failed
+    // fetch just keeps the last known data until the next poll.
+    await refreshUsageData()
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : 'Unknown error'
     console.error('[Polling] Error during poll:', errorMsg)

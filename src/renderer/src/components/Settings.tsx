@@ -1,9 +1,5 @@
 import React, { useEffect, useState } from 'react'
-
-interface SettingsSchema {
-  pollingIntervalMinutes: number
-  autoStartEnabled: boolean
-}
+import type { SettingsSchema } from '../../../shared/types'
 
 interface SettingsProps {
   onClose: () => void

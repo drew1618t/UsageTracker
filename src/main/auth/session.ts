@@ -17,7 +17,7 @@ export function initSession(onAuthSuccess: () => void): void {
     if (removed) return
 
     // Check if authentication cookie was added for Claude.ai
-    if (cookie.domain.includes('claude.ai')) {
+    if (cookie.domain?.includes('claude.ai')) {
       console.log('Cookie changed:', cookie.name)
 
       // Only trigger on the actual auth cookie, not supporting cookies
@@ -91,7 +91,7 @@ export async function persistSessionCookies(): Promise<void> {
     if (!cookie.expirationDate) {
       // Important: use cookie.secure flag to determine protocol
       const protocol = cookie.secure ? 'https' : 'http'
-      const domain = cookie.domain.replace(/^\./, '') // Remove leading dot
+      const domain = (cookie.domain ?? CLAUDE_DOMAIN).replace(/^\./, '') // Remove leading dot
       const url = `${protocol}://${domain}${cookie.path}`
 
       try {
@@ -127,7 +127,7 @@ export async function logout(): Promise<void> {
   for (const cookie of cookies) {
     // Important: use cookie.secure flag to determine protocol
     const protocol = cookie.secure ? 'https' : 'http'
-    const domain = cookie.domain.replace(/^\./, '') // Remove leading dot
+    const domain = (cookie.domain ?? CLAUDE_DOMAIN).replace(/^\./, '') // Remove leading dot
     const url = `${protocol}://${domain}${cookie.path}`
 
     try {

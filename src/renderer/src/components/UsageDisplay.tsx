@@ -1,45 +1,11 @@
-import React from 'react'
 import { formatDistanceToNow } from 'date-fns'
 import { ProgressBar } from './ProgressBar'
 import './UsageDisplay.css'
-
-type ProviderId = 'claude' | 'codex'
-
-interface ProviderLimit {
-  key: string
-  label: string
-  current: number
-  total: number
-  percentage: number
-  resetAt: string
-  isAcknowledged?: boolean
-}
-
-interface ProviderUsageData {
-  providerId: ProviderId
-  providerLabel: string
-  fetchedAt: string
-  limits: ProviderLimit[]
-  primaryLimitKey: string | null
-  source: 'remote' | 'local'
-  metadata?: {
-    planType?: string
-    totalTokens?: number
-    lastTokens?: number
-  }
-}
-
-interface ProviderUsageState {
-  data: ProviderUsageData | null
-  lastUpdated: string | null
-  error: string | null
-  isLoading: boolean
-  statusLabel: string
-}
-
-interface UsageDashboardState {
-  providers: Record<ProviderId, ProviderUsageState>
-}
+import type {
+  ProviderId,
+  ProviderUsageState,
+  UsageDashboardState
+} from '../../../shared/types'
 
 interface UsageDisplayProps {
   dashboard: UsageDashboardState

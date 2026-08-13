@@ -1,7 +1,7 @@
 import fs from 'fs/promises'
 import os from 'os'
 import path from 'path'
-import type { ProviderLimit, ProviderUsageData } from './types'
+import type { ProviderLimit, ProviderUsageData } from '../../shared/types'
 
 const CODEX_STALE_MS = 24 * 60 * 60 * 1000
 const SESSION_SCAN_LIMIT = 20

@@ -1,4 +1,4 @@
-import { BrowserWindow, screen, app } from 'electron'
+import { BrowserWindow, screen } from 'electron'
 import path from 'path'
 
 let popupWindow: BrowserWindow | null = null
